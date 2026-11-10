@@ -3,6 +3,8 @@
 An original 3D third-person action-adventure for the browser, set on the Konkan coast.
 Story campaign + a battle mode against bots. Runs on phones (touch) and PC (keyboard + mouse).
 
+Last updated: 10 November 2026
+
 **Status: Mission 0 "Andhera" is playable** with placeholder art (about 4 minutes: storm night, compass
 tutorial, lighthouse cutscene, stealth escape with checkpoints). Mission 1 is only a placeholder card.
 
