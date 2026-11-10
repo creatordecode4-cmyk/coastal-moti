@@ -1,0 +1,35 @@
+# Asset & third-party licenses
+
+Rule: every file under `/assets` and `/vendor` that we did not make ourselves gets ONE line here
+**before** it is committed. Only CC0 or clearly commercial-use-allowed licenses. No exceptions.
+
+Format: `name | author | URL | license | where it is used`
+
+## Third-party code
+
+- three.js 0.160.0 (`vendor/three.module.min.js`) | three.js authors | https://github.com/mrdoob/three.js | MIT (full text in `vendor/THREE-LICENSE.txt`) | 3D rendering engine
+
+## Third-party art, audio, fonts
+
+- None yet. Sky, sea, terrain, characters and props are generated in code; sounds are synthesized in code;
+  the UI uses the device's system font.
+
+## Original work made for this project (no third-party licence needed)
+
+- App icon (`assets/icons/icon.svg`, `icon-192.png`, `icon-512.png`) | project team | – | original | PWA / home-screen icon
+- Sky and sea shaders (`src/engine/sky.js`, `src/engine/sea.js`) | project team | – | original | environment
+- Placeholder models: player, bots, guards, village, lighthouse, props (`src/levels/`, `src/engine/player.js`, `src/ai/`) | project team | – | original | built from basic shapes in code
+- Shakti icons (`src/engine/shaktis.js`) and HUD (`src/ui/`) | project team | – | original | interface
+- Placeholder sound effects, storm ambience and thunder (`src/audio/audio.js`) | project team | – | original | synthesized with the Web Audio API, no files
+- Compass dial, half-map drawing and Dadaji's letter (`index.html`, `src/ui/`) | project team | – | original | Mission 0 interface
+
+## Free assets to add later (suggested sources, all CC0 — check each pack's page again when downloading)
+
+- Characters with animations (Veer, Kavya, Damini, Kaala Jaal gang): Quaternius character packs — https://quaternius.com
+- Boats, docks, huts, crates, palm trees, rocks, lighthouse parts: Kenney "Pirate Kit" / "Nature Kit" — https://kenney.nl/assets ; Quaternius nature packs
+- Kingfisher (Neelu) and drone (Cheel's): a low-poly bird and drone from Quaternius / Kenney, recoloured
+- Sand, rock, wood, plaster textures (1K is enough for mobile): Poly Haven — https://polyhaven.com/textures
+- Sky HDRIs, if we ever replace the shader sky: Poly Haven — https://polyhaven.com/hdris
+- UI click and combat sound effects: Kenney audio packs — https://kenney.nl/assets/category:Audio
+- Rain, wind and thunder recordings (to replace the synthesized storm): must be CC0, for example from freesound.org with the CC0 filter — https://freesound.org
+- Music and the lullaby: must be ORIGINAL (record or compose it ourselves); do not use an existing song.

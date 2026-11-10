@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Coastal Moti: The Lost Pearl</title>
+  <meta name="description" content="An original 3D action-adventure set on the Konkan coast.">
+  <meta name="theme-color" content="#0b2a3a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="src/ui/base.css">
+  <link rel="stylesheet" href="src/ui/hud.css">
+  <!-- Three.js is pinned to 0.160.0 and vendored locally so the game works offline. -->
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="game" aria-label="Game view"></canvas>
+
+  <!-- Touch only: catches joystick (left half) and look-drag (right half) pointers. -->
+  <div id="touch-layer" hidden></div>
+
+  <div id="hud">
+    <div id="vitals">
+      <div class="bar" id="health"><i></i><span id="health-label"></span></div>
+      <div class="bar" id="burst"><i></i><span>BURST</span></div>
+      <div id="shaktis"></div>
+    </div>
+
+    <div id="objective">
+      <div id="compass" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2 19 21 12 16.5 5 21z"/></svg>
+      </div>
+      <div>
+        <div id="objective-text"></div>
+        <div id="objective-dist"></div>
+      </div>
+    </div>
+
+    <!-- Stealth meter: only shown by stealth missions -->
+    <div id="stealth" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c3-5 6.5-7 10-7s7 2 10 7c-3 5-6.5 7-10 7s-7-2-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <div class="st-bar"><i></i></div>
+      <span id="stealth-label"></span>
+    </div>
+    <div id="toast"></div>
+
+    <div id="top-right">
+      <button id="pause-btn" type="button" aria-label="Pause"><i></i><i></i></button>
+      <div id="fps" aria-hidden="true"></div>
+    </div>
+
+    <div id="radio" hidden>
+      <b id="radio-callsign"></b>
+      <span id="radio-text"></span>
+    </div>
+
+    <div id="hint"></div>
+
+    <div id="touch-ui" hidden>
+      <div id="stick"><div id="stick-knob"></div></div>
+      <button class="tbtn" id="btn-attack" data-action="attack" type="button">Attack</button>
+      <button class="tbtn" id="btn-dodge" data-action="dodge" type="button">Dodge</button>
+      <button class="tbtn" id="btn-shakti" data-action="shakti" type="button">Shakti</button>
+      <button class="tbtn" id="btn-burst" data-action="burst" type="button">Burst</button>
+      <button class="tbtn" id="btn-tool" data-action="tool" type="button">Tool</button>
+    </div>
+  </div>
+
+  <div id="banner"></div>
+  <div id="damage-flash"></div>
+  <div id="fade"></div>
+
+  <div id="alert" class="overlay" hidden>
+    <div id="alert-title"></div>
+    <div id="alert-sub"></div>
+  </div>
+
+  <!-- Dadaji's brass compass (Mission 0 tutorial) -->
+  <div id="compass-ui" class="overlay" hidden>
+    <div class="cz-title">Dadaji's brass compass</div>
+    <div class="cz-stage" id="cz-stage">
+      <div class="cz-mark" id="cz-mark"><i></i><span>THE ISLAND</span></div>
+      <svg class="cz-case" id="cz-case" viewBox="-110 -110 220 220"></svg>
+      <svg class="cz-needle" id="cz-needle" viewBox="-110 -110 220 220">
+        <path d="M0 -78 9 0 0 12 -9 0z" fill="#c8402f"/><path d="M0 78 9 0 0 -12 -9 0z" fill="#d9dde2"/><circle r="6" fill="#3a2a12"/>
+      </svg>
+    </div>
+    <div class="cz-pips" id="cz-pips"><i></i><i></i><i></i></div>
+    <div class="cz-text" id="cz-text"></div>
+    <div class="cz-hint" id="cz-hint"></div>
+    <button type="button" id="cz-done" hidden>Keep the compass</button>
+  </div>
+
+  <!-- Dadaji's tin box: half a map and a letter -->
+  <div id="letter" class="overlay" hidden>
+    <div class="lt-paper">
+      <div class="lt-title">Dadaji's tin box</div>
+      <svg class="lt-map" viewBox="0 0 200 110" aria-label="Half of a hand-drawn map">
+        <path d="M4 6h150l10 14-8 12 12 14-9 13 11 15-8 13 6 17H4z" fill="#e6d3a3" stroke="#6b4f2a" stroke-width="2"/>
+        <path d="M22 78c14-22 30-8 44-26s30-4 46-20 26-6 38-10" fill="none" stroke="#6b4f2a" stroke-width="2" stroke-dasharray="5 5"/>
+        <path d="M30 34l8 12 8-12zM20 84c6-5 12-5 18 0M92 70c6-5 12-5 18 0" fill="none" stroke="#6b4f2a" stroke-width="2"/>
+        <circle cx="26" cy="78" r="4" fill="#8f3a2e"/>
+      </svg>
+      <div class="lt-item">Half a map. The other half is torn away.</div>
+      <p class="lt-text" id="lt-text"></p>
+      <div class="lt-sign">Dadaji</div>
+      <button type="button" id="lt-done">Keep it safe</button>
+    </div>
+  </div>
+
+  <div id="down" class="overlay" hidden>
+    <div class="down-text">Disha is down. Restarting.</div>
+  </div>
+
+  <div id="mission-card" class="overlay" hidden>
+    <div id="card-meta"></div>
+    <h1 id="card-name"></h1>
+    <div id="card-skip"></div>
+  </div>
+
+  <div id="pause-menu" class="overlay" hidden>
+    <div class="panel">
+      <h2>Paused</h2>
+      <button type="button" id="pm-resume" class="wide primary">Resume</button>
+      <div class="row">
+        <span>Graphics</span>
+        <div class="seg" id="pm-quality">
+          <button type="button" data-quality="low">Low</button>
+          <button type="button" data-quality="medium">Medium</button>
+          <button type="button" data-quality="high">High</button>
+        </div>
+      </div>
+      <div class="row">
+        <span>Sound</span>
+        <div class="seg" id="pm-sound">
+          <button type="button" data-muted="false">On</button>
+          <button type="button" data-muted="true">Off</button>
+        </div>
+      </div>
+      <button type="button" id="pm-restart" class="wide">Restart mission</button>
+      <button type="button" id="pm-reset" class="wide danger">Reset all progress</button>
+      <div id="pm-help"></div>
+    </div>
+  </div>
+
+  <div id="error" hidden></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
