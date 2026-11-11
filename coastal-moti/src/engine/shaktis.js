@@ -1,7 +1,7 @@
 // The five Shaktis. Order matches keys 1-5 and the story bible.
 // Effects and numbers here are PLACEHOLDER tuning for the engine; missions unlock them by id.
 export const SHAKTIS = [
-  { id: 'vayu',   name: 'Vayu',   element: 'wind',      color: 0xbfe9e0, cooldown: 3.0, kind: 'cone',       damage: 12, range: 7, push: 10 },
+  { id: 'vayu',   name: 'Vayu',   element: 'wind',      color: 0xbfe9e0, cooldown: 3.0, kind: 'dash',       damage: 12, range: 5, push: 11 }, // wind dash: pushes enemies, blows dust away
   { id: 'agni',   name: 'Agni',   element: 'fire',      color: 0xff7a2f, cooldown: 2.5, kind: 'projectile', damage: 30, speed: 22 },
   { id: 'jal',    name: 'Jal',    element: 'water',     color: 0x3fa9f5, cooldown: 6.0, kind: 'heal',       amount: 30 },
   { id: 'bijli',  name: 'Bijli',  element: 'lightning', color: 0xf7e463, cooldown: 4.0, kind: 'bolt',       damage: 40, range: 16 },

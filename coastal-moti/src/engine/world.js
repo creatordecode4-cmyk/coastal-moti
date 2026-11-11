@@ -41,9 +41,10 @@ export function createWorld(scene) {
     },
 
     // Height-field terrain. colorAt(height, x, z, outColor) paints each vertex.
-    terrain({ size = 180, segments = 90, colorAt }) {
+    terrain({ size = 180, segments = 90, center = [0, 0], colorAt }) {
       const geo = new THREE.PlaneGeometry(size, size, segments, segments);
       geo.rotateX(-Math.PI / 2);
+      geo.translate(center[0], 0, center[1]);
       const pos = geo.attributes.position;
       const colors = new Float32Array(pos.count * 3);
       const c = new THREE.Color();

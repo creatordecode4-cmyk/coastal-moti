@@ -96,7 +96,8 @@ export function createMissionManager(game) {
   function register(mission) { missions.push(mission); }
 
   async function start(id, { card = true, useCheckpoint = true } = {}) {
-    const mission = missions.find((m) => m.id === id) || missions[0];
+    // `aliases` lets an old save (for example the Mission 1 placeholder id) find the real mission.
+    const mission = missions.find((m) => m.id === id || m.aliases?.includes(id)) || missions[0];
     if (!mission) return;
     const my = ++token;
     active = mission; state = 'card'; freeRoam = false;

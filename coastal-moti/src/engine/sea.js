@@ -60,19 +60,24 @@ export function createSea(segments) {
   const mesh = new THREE.Mesh(buildGeometry(segments), material);
   mesh.name = 'sea';
   mesh.frustumCulled = false;
-  let time = 0, speed = 1;
+  let time = 0, speed = 1, amp = 0.22;
 
   return {
     mesh,
     update(dt) { time += dt * speed; material.uniforms.uTime.value = time; },
+    // Wave height at a point: the same formula as the vertex shader, so boats can float on it.
+    height(x, z) {
+      return (Math.sin(x * 0.09 + time * 0.9) * 0.55 + Math.sin(z * 0.13 + time * 1.2) * 0.35
+        + Math.sin((x + z) * 0.05 + time * 0.6) * 0.8) * amp;
+    },
     setSegments(n) {
       mesh.geometry.dispose();
       mesh.geometry = buildGeometry(n);
     },
-    setLook({ deep, shallow, amp, speed: s }) {
+    setLook({ deep, shallow, amp: a, speed: s }) {
       material.uniforms.uDeep.value.setHex(deep);
       material.uniforms.uShallow.value.setHex(shallow);
-      material.uniforms.uAmp.value = amp;
+      material.uniforms.uAmp.value = amp = a;
       speed = s;
     },
   };

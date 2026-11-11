@@ -165,3 +165,20 @@ body.cine #radio { position: fixed; bottom: 13vh; top: auto; z-index: 6; }
 .lt-text { margin: 10px 0 2px; font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: clamp(15px, 2.6vw, 19px); line-height: 1.45; }
 .lt-sign { font-family: Georgia, serif; font-style: italic; text-align: right; margin-bottom: 10px; }
 @media (max-height: 420px) { .cz-stage { width: min(46vh, 300px); } .cz-text { font-size: 13px; min-height: 1.3em; } .lt-map { width: 30%; } .lt-paper { padding: 8px 18px; } }
+
+/* ---------- sailing: wind dial ---------- */
+#wind { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+#wind svg { width: 78px; height: 78px; flex: none; }
+#wind .w-rim { fill: rgba(8, 30, 42, .62); stroke: var(--line); stroke-width: 2; }
+#wind .w-nogo { fill: rgba(229, 72, 77, .38); }
+#wind .w-arrow { fill: #cfe6ff; }
+#wind .w-boat { fill: var(--brass); }
+#wind .w-text { display: flex; flex-direction: column; font-size: 11px; line-height: 1.25; letter-spacing: .08em; }
+#wind .w-text b { font-size: 12px; color: #9be3b0; }
+#wind.z-irons .w-text b { color: #ff8f8a; }
+#wind.z-close .w-text b { color: var(--brass); }
+#wind .w-text i { font-style: normal; opacity: .6; font-size: 9px; }
+#banner.danger { border-color: var(--hp); color: #ffd9d6; }
+#prompt { position: absolute; left: 50%; bottom: calc(var(--sb) + 120px); transform: translateX(-50%); padding: 6px 14px; font-size: 13px; font-weight: 600;
+  background: rgba(4, 16, 24, .82); border: 1px solid var(--brass); border-radius: 16px; white-space: nowrap; }
+.touch #prompt { bottom: calc(var(--sb) + 58px); font-size: 12px; }

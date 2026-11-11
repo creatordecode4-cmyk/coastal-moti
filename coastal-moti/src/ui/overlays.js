@@ -19,11 +19,18 @@ export function createOverlays() {
       toastTimer = setTimeout(() => toastEl.classList.remove('on'), ms);
     },
     // Objective card: a big line across the screen that does not stop play.
-    banner(text, ms = 4200) {
+    banner(text, ms = 4200, danger = false) {
       bannerEl.textContent = text;
+      bannerEl.classList.toggle('danger', danger);
       bannerEl.classList.add('on');
       clearTimeout(bannerTimer);
       bannerTimer = setTimeout(() => bannerEl.classList.remove('on'), ms);
+    },
+    // A standing hint near the player ("Press E to place the diya"). Pass null to hide it.
+    prompt(text) {
+      const el = $('prompt');
+      if (el.textContent !== (text || '')) el.textContent = text || '';
+      el.hidden = !text;
     },
     showAlert(title, sub = '') {
       $('alert-title').textContent = title;

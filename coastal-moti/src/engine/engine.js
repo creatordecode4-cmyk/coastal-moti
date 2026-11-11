@@ -116,6 +116,7 @@ export function createEngine(canvas, initialQuality) {
   return {
     renderer, scene, camera, weather,
     setQuality, setShadowFocus, setEnvironment,
+    seaHeight: (x, z) => sea.height(x, z),
     onUpdate(fn) { updaters.push(fn); },
     onFps(cb) { fpsCallback = cb; },
     get frames() { return frames; },

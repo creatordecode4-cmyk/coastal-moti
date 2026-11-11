@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { clamp, damp } from './mathx.js';
+import { clamp, damp, lerpAngle } from './mathx.js';
 
 // Smooth third-person follow camera. Yaw/pitch come from mouse look or touch drag.
 // yaw = 0 means the camera sits on +Z looking toward -Z.
@@ -7,8 +7,14 @@ export function createCameraRig(game) {
   const camera = game.engine.camera;
   const target = new THREE.Vector3();
   const rig = { yaw: 0, pitch: 0.32, distance: game.mobile ? 7.5 : 6.5 };
+  const baseDistance = rig.distance;
   let dist = rig.distance;
   let snapped = false;
+  let manualT = 0;
+
+  // rig.autoYaw: when set (radians), the camera swings behind that direction unless the player is looking around.
+  rig.autoYaw = null;
+  rig.resetFollow = () => { rig.autoYaw = null; rig.distance = baseDistance; };
 
   rig.snap = () => { snapped = false; };
 
@@ -31,6 +37,8 @@ export function createCameraRig(game) {
       const look = game.input.lookDelta();
       rig.yaw -= look.x;
       rig.pitch = clamp(rig.pitch + look.y, -0.15, 1.2);
+      if (look.x || look.y) manualT = 2.5; else manualT -= dt;
+      if (rig.autoYaw !== null && manualT <= 0) rig.yaw = lerpAngle(rig.yaw, rig.autoYaw, damp(1.8, dt));
     }
     const tx = p.x, ty = p.y + 1.55, tz = p.z;
     if (!snapped) { target.set(tx, ty, tz); snapped = true; }

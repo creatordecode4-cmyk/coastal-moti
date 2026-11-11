@@ -3,10 +3,10 @@
 An original 3D third-person action-adventure for the browser, set on the Konkan coast.
 Story campaign + a battle mode against bots. Runs on phones (touch) and PC (keyboard + mouse).
 
-Last updated: 10 November 2026
+Last updated: 11 November 2026
 
-**Status: Mission 0 "Andhera" is playable** with placeholder art (about 4 minutes: storm night, compass
-tutorial, lighthouse cutscene, stealth escape with checkpoints). Mission 1 is only a placeholder card.
+**Status: Mission 0 "Andhera" and Mission 1 "Hawa ka Rukh" are playable** with placeholder art
+(about 4 minutes each). Mission 2 is only a placeholder card.
 
 ## Controls
 
@@ -24,6 +24,10 @@ tutorial, lighthouse cutscene, stealth escape with checkpoints). Mission 1 is on
 | Pause | Esc or P | pause button |
 
 The scheme is picked automatically (touch devices get the joystick and buttons).
+
+**Sailing (Mission 1):** forward (W / stick up) raises the sail, left and right steer, back (S / stick down)
+rows backward, letting go drops the sail. The HUD dial shows where the wind comes from; the red wedge is
+the direction the boat cannot sail. To go upwind, zig-zag (tack) on either side of the wedge.
 
 ## Run it
 
@@ -70,7 +74,8 @@ src/
   game.js             wires all systems together and runs the frame loop
   engine/
     engine.js         renderer, scene, lights, loop, quality + environment switching
-    environments.js   look presets: ENV_DAY, ENV_STORM_NIGHT (sky, light, sea, fog, rain, lightning)
+    environments.js   look presets: ENV_DAY, ENV_STORM_NIGHT, ENV_SEA_NIGHT (sky, light, sea, fog, rain, lightning)
+    boat.js           Dadaji's sailing boat: wind, points of sail, tacking, wave bobbing
     weather.js        rain (one draw call, animated in the shader) and lightning
     world.js          level loader + builder helpers + collision / line-of-sight API
     player.js         third-person controller: walk, run, dodge-roll, attack, Shakti, Burst, Tool
@@ -78,14 +83,17 @@ src/
     input.js combat.js health.js shaktis.js sky.js sea.js quality.js device.js events.js mathx.js
   levels/
     seepgaon.js       the village, the hill and the Diya-Ghar lighthouse (storm night)
+    openSea.js        open water with sea rocks, and the island with the Teen-Ungli Chattan
     testArena.js      daytime combat test island
   ai/
     guard.js          stealth guard: fixed waypoint route, torch vision cone, hearing
+    patrolBoat.js     smuggler speedboat: fixed route, sweeping searchlight, short chase
     bot.js            combat bot: patrol, investigate, chase, shoot, cover
   missions/
     missionManager.js mission flow, objectives, checkpoints, scripts, saving
     andhera.js        Mission 0 "Andhera"
-    mission1Placeholder.js
+    hawaKaRukh.js     Mission 1 "Hawa ka Rukh"
+    mission2Placeholder.js
     systemsCheck.js   combat test mission (developer only)
   ui/                 hud.js, touchControls.js, pauseMenu.js, missionCard.js, radio.js, overlays.js,
                       compassTutorial.js, letter.js, *.css
@@ -111,8 +119,33 @@ licenses/ASSETS.md    one line per third-party asset: name, author, URL, license
 
 Checkpoints (saved to localStorage, a refresh resumes there): `compass`, `escape`, `mid`, `box`.
 Flags saved in `progress.flags`: `hasCompass`, `compassPointsToIsland`, `hasHalfMap`, `hasDadajiLetter1`.
-To replay the mission after finishing it: pause menu -> "Reset all progress".
-Developer option: open `/?mission=t0_systems_check` for the daytime combat test arena.
+
+## Mission 1 "Hawa ka Rukh" (02:15 · Open sea)
+
+Starts by itself when Mission 0 ends.
+
+1. **Sailing:** Veer sails Dadaji's boat to the island. The night wind blows from the island, so he must
+   tack against it. Lullaby line 1 plays on the radio; Kavya ("Deepak") speaks for the first time.
+2. **Searchlights:** three Kaala Jaal speedboats follow fixed routes and sweep a pool of light over the sea.
+   One second in the light = alert, and that boat chases for about six seconds. Sea rocks block the light.
+   Turning side-on to the wind outruns the chase; sitting still or sailing close to the wind does not.
+   If the boat reaches Veer: "Caught", back to the last checkpoint.
+3. **The island:** find the Teen-Ungli Chattan (three finger pillars). Five flat stones surround it and a
+   carved sun mark shows where the sun rises. The diya goes on the stone opposite the sun mark, where
+   the three shadows would fall. A wrong stone puts the diya out.
+4. **Reward:** the first Rani Nishaan lights up and the **Vayu Shakti** is unlocked and saved: a wind dash
+   that pushes nearby enemies and blows dust away. A short tutorial makes the player use it once on a
+   dust swirl, which uncovers Dadaji's second letter.
+5. One-line card, then the Mission 2 placeholder card.
+
+Checkpoints: `mid` (half-way, behind a rock), `island` (landed), `nishaan` (Vayu unlocked).
+Flags: `raniNishaan1`, `vayuTutorialDone`, `hasDadajiLetter2`.
+
+## Replaying and jumping to a mission
+
+- Pause menu -> "Reset all progress" starts again from Mission 0.
+- Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`.
+- Developer only: `?mission=t0_systems_check` opens the daytime combat test arena.
 
 ## How to add a mission
 
@@ -146,12 +179,14 @@ To swap in a real file: `game.audio.load('attack', 'assets/audio/attack.ogg')`, 
 
 - All art is placeholder shapes; characters have no skeletal animation.
 - "Climbing the lighthouse" is a cutscene: there are no interiors, stairs, jumping or climbing yet.
+- Sailing is simplified: the sail trims itself, there is no capsizing, and the wind only swings a little.
+- Patrol boats do not avoid each other and only check line of sight against sea rocks.
 - Guards never leave their routes (by design for this mission) and do not search for the player.
 - Line of sight is checked in 2D against walls, houses and tall stacks; low props do not hide Veer.
 - Combat bots (test arena) still have no path-finding.
 - Shakti effects and all damage numbers are placeholder tuning.
 - Not yet profiled on a real phone. The 30 FPS target must be checked on a mid-range Android device.
-- Stealth difficulty was tuned with an automated walker, not with human players.
+- Stealth and sailing difficulty were tuned with automated players, not with human players.
 
 ## Tech rules
 

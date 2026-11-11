@@ -11,10 +11,12 @@ import { createAudio } from './audio/audio.js';
 import { loadProgress, saveProgress, clearProgress, freshProgress } from './save/save.js';
 import { createMissionManager } from './missions/missionManager.js';
 import { andhera } from './missions/andhera.js';
-import { mission1Placeholder } from './missions/mission1Placeholder.js';
+import { hawaKaRukh } from './missions/hawaKaRukh.js';
+import { mission2Placeholder } from './missions/mission2Placeholder.js';
 import { systemsCheck } from './missions/systemsCheck.js';
 import { testArena } from './levels/testArena.js';
 import { seepgaon } from './levels/seepgaon.js';
+import { openSea } from './levels/openSea.js';
 import { createOverlays } from './ui/overlays.js';
 import { createCompassTutorial } from './ui/compassTutorial.js';
 import { createLetter } from './ui/letter.js';
@@ -26,7 +28,7 @@ import { enableTouchControls } from './ui/touchControls.js';
 import { showControlsHint } from './ui/controlsHint.js';
 
 const XP_PER_BOT = 40, XP_PER_LEVEL = 100;
-const LEVELS = { testArena, seepgaon };
+const LEVELS = { testArena, seepgaon, openSea };
 
 // Wires every system together. `game` is the shared context that systems receive.
 export function createGame({ canvas, mobile, settings, devMission = null }) {
@@ -39,7 +41,9 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     paused: false,   // pause menu open
     frozen: true,    // mission card / "down" screen: the world does not tick
     objectiveTarget: null,
-    stealth: null,   // { level: 0..1, lit: boolean } while a stealth mission runs
+    stealth: null,   // { level: 0..1, lit: boolean, label? } while a stealth mission runs
+    boat: null,      // the boat Veer is sailing (src/engine/boat.js), or null on foot
+    sail: null,      // { rel, zone, speed } for the HUD wind dial while sailing
   };
   game.audio = createAudio(settings);
   game.input = createInput(canvas);
@@ -132,6 +136,10 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     game.radio.clear();
     resetHooks.splice(0).forEach((fn) => fn());
     game.stealth = null;
+    game.boat = null;
+    game.sail = null;
+    game.rig.resetFollow();
+    game.prompt(null);
     game.rig.cinematic = null;
     game.setCinematic(false);
     game.hideAlert();
@@ -166,7 +174,7 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
 
     const live = !game.paused && !game.frozen;
     if (live) {
-      player.update(dt);
+      if (game.boat?.active) game.boat.update(dt); else player.update(dt);
       for (const b of game.bots) b.update(dt);
       for (let i = game.bots.length - 1; i >= 0; i--) {
         if (game.bots[i].remove) { game.bots[i].dispose(); game.bots.splice(i, 1); }
@@ -213,8 +221,10 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
 
   // ---- missions ------------------------------------------------------------
   game.missions.register(andhera);
-  game.missions.register(mission1Placeholder);
-  // Developer option: ?mission=t0_systems_check loads the combat test arena.
+  game.missions.register(hawaKaRukh);
+  game.missions.register(mission2Placeholder);
+  // Developer options: ?mission=<id> starts at that mission (for example ?mission=m1_hawa_ka_rukh).
+  // ?mission=t0_systems_check loads the combat test arena.
   if (devMission === systemsCheck.id) game.missions.register(systemsCheck);
 
   game.start = () => {

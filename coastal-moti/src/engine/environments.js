@@ -14,3 +14,12 @@ export const ENV_STORM_NIGHT = {
   fog: { color: 0x1d2b3b, near: 22, far: 150 },
   rain: 1, lightning: true, ambientSound: 'storm',
 };
+
+// Open sea at night, same storm but thinner rain and longer sight so searchlights read from far away.
+export const ENV_SEA_NIGHT = {
+  ...ENV_STORM_NIGHT,
+  hemi: [0x8fa6cc, 0x232c3a, 1.05],
+  sea: { deep: 0x0a2233, shallow: 0x2c6a84, amp: 0.45, speed: 1.5 },
+  fog: { color: 0x1d2b3b, near: 35, far: 210 },
+  rain: 0.6,
+};

@@ -27,6 +27,18 @@
       <div class="bar" id="health"><i></i><span id="health-label"></span></div>
       <div class="bar" id="burst"><i></i><span>BURST</span></div>
       <div id="shaktis"></div>
+      <!-- Sailing: where the wind comes from, relative to the bow (up = straight ahead) -->
+      <div id="wind" hidden>
+        <svg viewBox="-50 -50 100 100" aria-hidden="true">
+          <circle r="46" class="w-rim"/>
+          <g id="wind-rot">
+            <path d="M0 0 L-29.5 -35.2 A46 46 0 0 1 29.5 -35.2 Z" class="w-nogo"/>
+            <path d="M0 -44 L7 -28 L2.2 -28 L2.2 -14 L-2.2 -14 L-2.2 -28 L-7 -28 Z" class="w-arrow" transform="rotate(180 0 -29)"/>
+          </g>
+          <path d="M0 -17 C7 -8 7 8 5 16 L-5 16 C-7 8 -7 -8 0 -17 Z" class="w-boat"/>
+        </svg>
+        <div class="w-text"><b id="wind-zone"></b><span id="wind-speed"></span><i>WIND</i></div>
+      </div>
     </div>
 
     <div id="objective">
@@ -46,6 +58,7 @@
       <span id="stealth-label"></span>
     </div>
     <div id="toast"></div>
+    <div id="prompt" hidden></div>
 
     <div id="top-right">
       <button id="pause-btn" type="button" aria-label="Pause"><i></i><i></i></button>
@@ -97,14 +110,14 @@
   <!-- Dadaji's tin box: half a map and a letter -->
   <div id="letter" class="overlay" hidden>
     <div class="lt-paper">
-      <div class="lt-title">Dadaji's tin box</div>
-      <svg class="lt-map" viewBox="0 0 200 110" aria-label="Half of a hand-drawn map">
+      <div class="lt-title" id="lt-title">Dadaji's tin box</div>
+      <svg class="lt-map" id="lt-map" viewBox="0 0 200 110" aria-label="Half of a hand-drawn map">
         <path d="M4 6h150l10 14-8 12 12 14-9 13 11 15-8 13 6 17H4z" fill="#e6d3a3" stroke="#6b4f2a" stroke-width="2"/>
         <path d="M22 78c14-22 30-8 44-26s30-4 46-20 26-6 38-10" fill="none" stroke="#6b4f2a" stroke-width="2" stroke-dasharray="5 5"/>
         <path d="M30 34l8 12 8-12zM20 84c6-5 12-5 18 0M92 70c6-5 12-5 18 0" fill="none" stroke="#6b4f2a" stroke-width="2"/>
         <circle cx="26" cy="78" r="4" fill="#8f3a2e"/>
       </svg>
-      <div class="lt-item">Half a map. The other half is torn away.</div>
+      <div class="lt-item" id="lt-item">Half a map. The other half is torn away.</div>
       <p class="lt-text" id="lt-text"></p>
       <div class="lt-sign">Dadaji</div>
       <button type="button" id="lt-done">Keep it safe</button>

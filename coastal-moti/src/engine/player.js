@@ -7,6 +7,7 @@ const WALK_SPEED = 3.4, RUN_SPEED = 6.4;
 const ROLL_SPEED = 11, ROLL_TIME = 0.42, ROLL_COOLDOWN = 0.9;
 const RADIUS = 0.4;
 const ATTACK_DAMAGE = 25, ATTACK_RANGE = 2.5, ATTACK_ARC = 1.1, ATTACK_TIME = 0.28, ATTACK_COOLDOWN = 0.42;
+const DASH_SPEED = 30, DASH_TIME = 0.22; // Vayu: about 6.5 m
 const BURST_DAMAGE = 70, BURST_RANGE = 8, BURST_CHARGE_PER_DAMAGE = 0.8;
 
 // Third-person character controller + the player's combat actions.
@@ -48,6 +49,7 @@ export function createPlayer(game) {
   };
   let rollT = 0, rollCd = 0, rollX = 0, rollZ = 0;
   let attackT = 0, attackCd = 0, stepT = 0, toolCd = 0;
+  let dashT = 0, dashX = 0, dashZ = 0;
 
   health.onDeath = () => { game.onPlayerDown(); };
 
@@ -59,7 +61,7 @@ export function createPlayer(game) {
     player.facing = facing;
     player.burst = 0;
     player.shaktiCooldowns.fill(0);
-    rollT = rollCd = attackT = attackCd = 0;
+    rollT = rollCd = attackT = attackCd = dashT = 0;
     player.rolling = false;
     tilt.rotation.set(0, 0, 0); tilt.scale.setScalar(1);
     root.visible = true;
@@ -128,13 +130,13 @@ export function createPlayer(game) {
     if (s.kind !== 'heal') player.facing = a;
     const chest = new THREE.Vector3(pos.x, pos.y + 1.2, pos.z);
 
-    if (s.kind === 'cone') {            // wind gust: light damage, big push
+    if (s.kind === 'dash') {            // wind dash: rush forward, shove everything nearby aside
+      dashT = DASH_TIME; dashX = ax; dashZ = az;
       for (const b of livingBots()) {
-        if (distTo(b) < s.range && Math.abs(angleDiff(a, angleTo(b))) < 0.7) {
-          game.damageBot(b, s.damage, { x: ax * s.push, z: az * s.push });
-        }
+        const d = distTo(b);
+        if (d < s.range) game.damageBot(b, s.damage, { x: (b.pos.x - pos.x) / (d || 1) * s.push, z: (b.pos.z - pos.z) / (d || 1) * s.push });
       }
-      game.combat.ring({ x: pos.x + ax * 2.5, y: pos.y, z: pos.z + az * 2.5 }, s.color, s.range * 0.6, 0.35);
+      game.combat.ring(pos, s.color, s.range, 0.4);
     } else if (s.kind === 'projectile') {
       game.combat.fire({ x: chest.x + ax * 0.6, y: chest.y, z: chest.z + az * 0.6, dx: ax, dz: az,
         speed: s.speed, damage: s.damage, team: 'player', color: s.color, radius: 0.7 });
@@ -180,6 +182,9 @@ export function createPlayer(game) {
     game.events.emit('tool');
   }
 
+  // Used by vehicles (the boat): put Veer somewhere without running the foot controller.
+  player.setPose = (x, y, z, facing) => { pos.set(x, y, z); player.facing = facing; player.moving = false; sync(); };
+
   function sync() {
     root.position.copy(pos);
     root.rotation.y = player.facing;
@@ -202,7 +207,10 @@ export function createPlayer(game) {
     if (len > 1e-4) { dx /= len; dz /= len; }
     player.moving = false;
 
-    if (rollT > 0) {
+    if (dashT > 0) {
+      dashT -= dt;
+      world.move(pos, dashX * DASH_SPEED * dt, dashZ * DASH_SPEED * dt, RADIUS);
+    } else if (rollT > 0) {
       rollT -= dt;
       world.move(pos, rollX * ROLL_SPEED * dt, rollZ * ROLL_SPEED * dt, RADIUS);
       const k = 1 - Math.max(0, rollT) / ROLL_TIME;

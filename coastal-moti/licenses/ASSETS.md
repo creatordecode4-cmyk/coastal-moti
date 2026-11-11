@@ -18,10 +18,12 @@ Format: `name | author | URL | license | where it is used`
 
 - App icon (`assets/icons/icon.svg`, `icon-192.png`, `icon-512.png`) | project team | – | original | PWA / home-screen icon
 - Sky and sea shaders (`src/engine/sky.js`, `src/engine/sea.js`) | project team | – | original | environment
-- Placeholder models: player, bots, guards, village, lighthouse, props (`src/levels/`, `src/engine/player.js`, `src/ai/`) | project team | – | original | built from basic shapes in code
+- Placeholder models: player, bots, guards, boats, village, lighthouse, island, props (`src/levels/`, `src/engine/`, `src/ai/`) | project team | – | original | built from basic shapes in code
 - Shakti icons (`src/engine/shaktis.js`) and HUD (`src/ui/`) | project team | – | original | interface
 - Placeholder sound effects, storm ambience and thunder (`src/audio/audio.js`) | project team | – | original | synthesized with the Web Audio API, no files
 - Compass dial, half-map drawing and Dadaji's letter (`index.html`, `src/ui/`) | project team | – | original | Mission 0 interface
+- Wind dial (`index.html`, `src/ui/hud.js`) | project team | – | original | Mission 1 interface
+- Lullaby line "Teen ungli jab suraj ko roke, hawa se poochh kinara kahan." and all dialogue | project team | – | original | story text
 
 ## Free assets to add later (suggested sources, all CC0 — check each pack's page again when downloading)
 

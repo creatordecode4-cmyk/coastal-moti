@@ -12,7 +12,12 @@ export function createLetter() {
   window.addEventListener('keydown', (e) => { if (!el.hidden && (e.code === 'Enter' || e.code === 'Space')) finish(); });
 
   return {
-    show(letterText) {
+    // options: { title, item, map } - the half-map drawing only shows when map is true.
+    show(letterText, { title = "Dadaji's tin box", item = 'Half a map. The other half is torn away.', map = true } = {}) {
+      document.getElementById('lt-title').textContent = title;
+      document.getElementById('lt-item').textContent = item;
+      document.getElementById('lt-item').hidden = !item;
+      document.getElementById('lt-map').style.display = map ? '' : 'none';
       text.textContent = `“${letterText}”`;
       el.hidden = false;
       return new Promise((r) => { resolve = r; });

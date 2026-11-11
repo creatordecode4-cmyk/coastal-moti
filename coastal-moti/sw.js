@@ -1,6 +1,6 @@
 // Simple service worker: precache the app shell, then network-first with an offline fallback.
 // Bump CACHE_VERSION on every release so players get the new files.
-const CACHE_VERSION = 'coastal-moti-v0.3.0';
+const CACHE_VERSION = 'coastal-moti-v0.4.0';
 
 // App shell: everything needed to boot. Add new source files and assets here.
 const PRECACHE = [
@@ -10,7 +10,9 @@ const PRECACHE = [
   'vendor/three.module.min.js',
   'src/ai/bot.js',
   'src/ai/guard.js',
+  'src/ai/patrolBoat.js',
   'src/audio/audio.js',
+  'src/engine/boat.js',
   'src/engine/cameraRig.js',
   'src/engine/combat.js',
   'src/engine/device.js',
@@ -28,11 +30,13 @@ const PRECACHE = [
   'src/engine/weather.js',
   'src/engine/world.js',
   'src/game.js',
+  'src/levels/openSea.js',
   'src/levels/seepgaon.js',
   'src/levels/testArena.js',
   'src/main.js',
   'src/missions/andhera.js',
-  'src/missions/mission1Placeholder.js',
+  'src/missions/hawaKaRukh.js',
+  'src/missions/mission2Placeholder.js',
   'src/missions/missionManager.js',
   'src/missions/systemsCheck.js',
   'src/save/save.js',
