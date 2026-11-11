@@ -26,6 +26,7 @@
     <div id="vitals">
       <div class="bar" id="health"><i></i><span id="health-label"></span></div>
       <div class="bar" id="burst"><i></i><span>BURST</span></div>
+      <div class="bar" id="breath" hidden><i></i><span>BREATH</span></div>
       <div id="shaktis"></div>
       <!-- Sailing: where the wind comes from, relative to the bow (up = straight ahead) -->
       <div id="wind" hidden>
@@ -59,6 +60,10 @@
     </div>
     <div id="toast"></div>
     <div id="prompt" hidden></div>
+    <!-- Hold actions (open an oyster, share breath) -->
+    <div id="holdbar" hidden><span id="holdbar-label"></span><div class="hb-track"><i></i></div></div>
+    <!-- Timed action (cut the net): press when the marker is in the green zone -->
+    <div id="cutter" hidden><span id="cutter-label"></span><div class="ct-track"><b class="ct-zone"></b><i></i></div></div>
 
     <div id="top-right">
       <button id="pause-btn" type="button" aria-label="Pause"><i></i><i></i></button>
@@ -84,6 +89,7 @@
 
   <div id="banner"></div>
   <div id="damage-flash"></div>
+  <div id="breath-vignette"></div>
   <div id="fade"></div>
 
   <div id="alert" class="overlay" hidden>

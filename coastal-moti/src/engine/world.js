@@ -28,14 +28,16 @@ export function createWorld(scene) {
 
   // ---- builder: what a level uses to construct itself ----------------------
   const builder = {
+    camera: null,   // set by the game: levels use it for effects that follow the view
     rand: Math.random,
     heightAt: (x, z) => heightFn(x, z),
 
     add(object) { scene.add(object); owned.push(object); return object; },
 
-    collider(cx, cz, sx, sz, height, blocksSight) {
+    // baseY: bottom of the box. Default: it stands on the ground.
+    collider(cx, cz, sx, sz, height, blocksSight, baseY) {
       const col = { minX: cx - sx / 2, maxX: cx + sx / 2, minZ: cz - sz / 2, maxZ: cz + sz / 2,
-        cx, cz, y: heightFn(cx, cz), height, blocksSight };
+        cx, cz, y: baseY ?? heightFn(cx, cz), height, blocksSight };
       world.colliders.push(col);
       return col;
     },
@@ -143,6 +145,7 @@ export function createWorld(scene) {
     buildCoverPoints();
   };
   world.update = (dt, time) => world.level.update?.(dt, time);
+  world.setCamera = (camera) => { builder.camera = camera; };
 
   // ---- collision API -------------------------------------------------------
   // Push a circle (p.x, p.z, radius) out of every box it overlaps.
@@ -161,6 +164,26 @@ export function createWorld(scene) {
         const m = Math.min(l, r, t, b);
         if (m === l) p.x = k.minX - radius; else if (m === r) p.x = k.maxX + radius;
         else if (m === t) p.z = k.minZ - radius; else p.z = k.maxZ + radius;
+      }
+    }
+  };
+
+  // Swimming: push a sphere (p.x, p.y, p.z, radius) out of every box, in 3D.
+  world.resolveSphere = (p, radius) => {
+    for (const k of world.colliders) {
+      const y0 = k.floating ? k.y : k.y - 1.5, y1 = k.y + k.height;   // ground boxes are sunk 1.5 m
+      const nx = clamp(p.x, k.minX, k.maxX), ny = clamp(p.y, y0, y1), nz = clamp(p.z, k.minZ, k.maxZ);
+      const dx = p.x - nx, dy = p.y - ny, dz = p.z - nz;
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 >= radius * radius) continue;
+      if (d2 > 1e-8) {
+        const d = Math.sqrt(d2);
+        p.x = nx + (dx / d) * radius; p.y = ny + (dy / d) * radius; p.z = nz + (dz / d) * radius;
+      } else {   // centre inside the box: leave by the nearest face
+        const faces = [[p.x - k.minX, 'x', k.minX - radius], [k.maxX - p.x, 'x', k.maxX + radius], [p.y - y0, 'y', y0 - radius],
+          [y1 - p.y, 'y', y1 + radius], [p.z - k.minZ, 'z', k.minZ - radius], [k.maxZ - p.z, 'z', k.maxZ + radius]];
+        faces.sort((a, b) => a[0] - b[0]);
+        p[faces[0][1]] = faces[0][2];
       }
     }
   };

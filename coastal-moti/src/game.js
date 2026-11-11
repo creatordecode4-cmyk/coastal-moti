@@ -13,12 +13,14 @@ import { createMissionManager } from './missions/missionManager.js';
 import { andhera } from './missions/andhera.js';
 import { hawaKaRukh } from './missions/hawaKaRukh.js';
 import { aaina } from './missions/aaina.js';
-import { mission3Placeholder } from './missions/mission3Placeholder.js';
+import { gehriSaans } from './missions/gehriSaans.js';
+import { mission4Placeholder } from './missions/mission4Placeholder.js';
 import { systemsCheck } from './missions/systemsCheck.js';
 import { testArena } from './levels/testArena.js';
 import { seepgaon } from './levels/seepgaon.js';
 import { openSea } from './levels/openSea.js';
 import { temple } from './levels/temple.js';
+import { barge } from './levels/barge.js';
 import { createOverlays } from './ui/overlays.js';
 import { createCompassTutorial } from './ui/compassTutorial.js';
 import { createLetter } from './ui/letter.js';
@@ -30,7 +32,7 @@ import { enableTouchControls } from './ui/touchControls.js';
 import { showControlsHint } from './ui/controlsHint.js';
 
 const XP_PER_BOT = 40, XP_PER_LEVEL = 100;
-const LEVELS = { testArena, seepgaon, openSea, temple };
+const LEVELS = { testArena, seepgaon, openSea, temple, barge };
 
 // Wires every system together. `game` is the shared context that systems receive.
 export function createGame({ canvas, mobile, settings, devMission = null }) {
@@ -46,10 +48,12 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     stealth: null,   // { level: 0..1, lit: boolean, label? } while a stealth mission runs
     boat: null,      // the boat Veer is sailing (src/engine/boat.js), or null on foot
     sail: null,      // { rel, zone, speed } for the HUD wind dial while sailing
+    swim: null,      // the swimmer (src/engine/swim.js) while Veer is in the water, or null
   };
   game.audio = createAudio(settings);
   game.input = createInput(canvas);
   game.world = createWorld(engine.scene);
+  game.world.setCamera(engine.camera);
   game.player = createPlayer(game);
   game.rig = createCameraRig(game);
   game.combat = createCombat(game);
@@ -111,8 +115,15 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     return dealt;
   };
 
-  game.damagePlayer = (amount) => {
-    if (game.player.health.damage(amount, 'bot') > 0) { game.audio.play('hurt'); game.hud.flashDamage(); }
+  // source 'drown' is the only damage the Jal shield cannot stop.
+  game.damagePlayer = (amount, source = 'bot') => {
+    if (game.player.shieldT > 0 && source !== 'drown') {
+      game.combat.ring(game.player.pos, 0x3fa9f5, 1.4, 0.2);
+      game.audio.play('ui');
+      game.events.emit('shieldBlock', source);
+      return;
+    }
+    if (game.player.health.damage(amount, source) > 0) { game.audio.play('hurt'); game.hud.flashDamage(); }
   };
 
   game.addXp = (xp) => {
@@ -140,6 +151,11 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     game.stealth = null;
     game.boat = null;
     game.sail = null;
+    game.swim?.dispose();
+    game.swim = null;
+    game.holdBar('', null);
+    game.cutter('', null);
+    document.body.classList.remove('lowbreath');
     game.rig.resetFollow();
     game.prompt(null);
     game.rig.cinematic = null;
@@ -176,7 +192,10 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
 
     const live = !game.paused && !game.frozen;
     if (live) {
-      if (game.boat?.active) game.boat.update(dt); else player.update(dt);
+      if (game.boat?.active) game.boat.update(dt);
+      else if (game.swim?.active) game.swim.update(dt);
+      else player.update(dt);
+      player.tick(dt);
       for (const b of game.bots) b.update(dt);
       for (let i = game.bots.length - 1; i >= 0; i--) {
         if (game.bots[i].remove) { game.bots[i].dispose(); game.bots.splice(i, 1); }
@@ -225,8 +244,9 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
   game.missions.register(andhera);
   game.missions.register(hawaKaRukh);
   game.missions.register(aaina);
-  game.missions.register(mission3Placeholder);
-  // Developer options: ?mission=<id> starts at that mission (for example ?mission=m1_hawa_ka_rukh).
+  game.missions.register(gehriSaans);
+  game.missions.register(mission4Placeholder);
+  // Jump links: ?mission=<id> starts at that mission, for example ?mission=m3_gehri_saans.
   // ?mission=t0_systems_check loads the combat test arena.
   if (devMission === systemsCheck.id) game.missions.register(systemsCheck);
 

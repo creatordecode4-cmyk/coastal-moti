@@ -32,6 +32,24 @@ export function createOverlays() {
       if (el.textContent !== (text || '')) el.textContent = text || '';
       el.hidden = !text;
     },
+    // Progress bar for hold actions. fraction = null hides it.
+    holdBar(label, fraction) {
+      const el = $('holdbar');
+      el.hidden = fraction === null || fraction === undefined;
+      if (el.hidden) return;
+      $('holdbar-label').textContent = label;
+      el.querySelector('i').style.transform = `scaleX(${Math.max(0, Math.min(1, fraction))})`;
+    },
+    // Timing bar. marker and zone are 0..1 positions; zone = [from, to]. marker = null hides it.
+    cutter(label, marker, zone = [0.4, 0.6]) {
+      const el = $('cutter');
+      el.hidden = marker === null || marker === undefined;
+      if (el.hidden) return;
+      $('cutter-label').textContent = label;
+      const z = el.querySelector('.ct-zone');
+      z.style.left = `${zone[0] * 100}%`; z.style.width = `${(zone[1] - zone[0]) * 100}%`;
+      el.querySelector('i').style.left = `${marker * 100}%`;
+    },
     showAlert(title, sub = '') {
       $('alert-title').textContent = title;
       $('alert-sub').textContent = sub;

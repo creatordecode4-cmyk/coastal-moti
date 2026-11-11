@@ -33,3 +33,23 @@ export const ENV_DAWN = {
   fog: { color: 0xe3a878, near: 45, far: 270 },
   rain: 0.15, lightning: false, ambientSound: 'storm',
 };
+
+// Afternoon at the salvage barge: grey sky after the storm night.
+export const ENV_BARGE_DAY = {
+  zenith: 0x6f8fb0, horizon: 0xcfd6d8, sun: 0xfff1d8, sunDisc: 0.6,
+  sunDir: [0.2, 0.9, 0.3],
+  hemi: [0xdfe8f0, 0x56605a, 1.1], sunIntensity: 1.3,
+  sea: { deep: 0x0b4f6c, shallow: 0x2fa7a0, amp: 0.25, speed: 1.1 },
+  fog: { color: 0xcfd6d8, near: 60, far: 300 },
+  rain: 0.2, lightning: false, ambientSound: 'storm',
+};
+
+// Under the surface: blue fog that hides everything beyond about 55 m, bright water overhead.
+export const ENV_UNDERWATER = {
+  zenith: 0x8fdcea, horizon: 0x0e4a66, sun: 0xcfeeff, sunDisc: 0.5,
+  sunDir: [0.2, 0.9, 0.3],
+  hemi: [0xa9dcea, 0x0d3140, 1.2], sunIntensity: 0.75,
+  sea: { deep: 0x2b8fa8, shallow: 0xa9ecf2, amp: 0.25, speed: 1.1 },
+  fog: { color: 0x0e4a66, near: 3, far: 58 },
+  rain: 0, lightning: false, ambientSound: 'storm',
+};

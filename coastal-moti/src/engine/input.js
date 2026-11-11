@@ -15,6 +15,7 @@ const MAX_MOUSE_STEP = 120; // pixels per mouse event
 export function createInput(canvas) {
   const keys = new Set();
   const pressed = new Set();
+  const held = new Set();      // actions currently held down (keyboard or touch button)
   const touchMove = { x: 0, y: 0 };
   let lookX = 0, lookY = 0;
   let dragging = false, wasLocked = false, skipMove = false;
@@ -25,11 +26,11 @@ export function createInput(canvas) {
     if (e.repeat) return;
     keys.add(e.code);
     const action = KEY_ACTIONS[e.code];
-    if (action) pressed.add(action);
+    if (action) { pressed.add(action); held.add(action); }
     if (action || e.code.startsWith('Arrow')) e.preventDefault();
   });
-  window.addEventListener('keyup', (e) => keys.delete(e.code));
-  window.addEventListener('blur', () => { keys.clear(); dragging = false; });
+  window.addEventListener('keyup', (e) => { keys.delete(e.code); const a = KEY_ACTIONS[e.code]; if (a) held.delete(a); });
+  window.addEventListener('blur', () => { keys.clear(); held.clear(); dragging = false; });
 
   canvas.addEventListener('mousedown', (e) => {
     if (locked()) {
@@ -75,7 +76,12 @@ export function createInput(canvas) {
     lookDelta() { const d = { x: lookX, y: lookY }; lookX = lookY = 0; return d; },
     endFrame() { pressed.clear(); },
     // --- used by the touch UI ---
-    press(action) { pressed.add(action); },
+    press(action) { pressed.add(action); held.add(action); },
+    release(action) { held.delete(action); },
+    // True while the key / touch button for this action is held down.
+    isHeld(action) { return held.has(action); },
+    // Swimming: Space / C on a keyboard go straight up / down.
+    vertical() { return (keys.has('Space') ? 1 : 0) - (keys.has('KeyC') || keys.has('ControlLeft') ? 1 : 0); },
     setMove(x, y) { touchMove.x = x; touchMove.y = y; },
     addLook(dx, dy) { lookX += dx; lookY += dy; },
     isLocked: locked,

@@ -11,6 +11,7 @@ export function createHud(game) {
   const compass = $('compass'), arrow = compass.firstElementChild;
   const flash = $('damage-flash');
   const btnShakti = $('btn-shakti'), btnBurst = $('btn-burst');
+  const breathEl = $('breath'), breathFill = breathEl.firstElementChild;
   const wind = $('wind'), windRot = $('wind-rot'), windZone = $('wind-zone'), windSpeed = $('wind-speed');
   const ZONES = { irons: 'INTO WIND', close: 'CLOSE HAUL', reach: 'REACH', run: 'RUNNING' };
   const stealth = $('stealth'), stealthFill = stealth.querySelector('i'), stealthLabel = $('stealth-label');
@@ -68,6 +69,13 @@ export function createHud(game) {
       });
       set('stealthLevel', st.level.toFixed(2), (v) => { stealthFill.style.transform = `scaleX(${v})`; });
     }
+
+    // Breath meter (only while swimming). Below 25 % everything warns: the bar, the screen edge.
+    const br = game.swim?.active ? game.swim.breath / 100 : null;
+    set('breathOn', br !== null, (v) => { breathEl.hidden = !v; });
+    const low = br !== null && br < 0.25;
+    set('breathLow', low, (v) => { breathEl.classList.toggle('low', v); document.body.classList.toggle('lowbreath', v); });
+    if (br !== null) set('breath', br.toFixed(2), (v) => { breathFill.style.transform = `scaleX(${v})`; });
 
     // Wind dial (only while sailing): the arrow shows where the wind comes FROM, up = the bow.
     const sl = game.sail;

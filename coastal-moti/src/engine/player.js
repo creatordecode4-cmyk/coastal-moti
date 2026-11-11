@@ -36,7 +36,12 @@ export function createPlayer(game) {
   oar.add(shaft, blade);
   oar.position.set(0.38, 1.0, 0.05);
   model.add(body, head, nose, band, oar);
-  root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  const shield = new THREE.Mesh(new THREE.SphereGeometry(1.15, 14, 10), new THREE.MeshBasicMaterial({ color: 0x3fa9f5,
+    transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+  shield.position.y = 0.95; shield.visible = false;
+  tilt.add(shield);
+  root.traverse((o) => { if (o.isMesh && o !== shield) o.castShadow = true; });
+  root.rotation.order = 'YXZ';
   game.scene.add(root);
 
   const health = new Health(100);
@@ -46,6 +51,7 @@ export function createPlayer(game) {
     facing: Math.PI, burst: 0, currentShakti: 0,
     shaktiCooldowns: SHAKTIS.map(() => 0),
     rolling: false, running: false, moving: false,
+    shieldT: 0,     // seconds of Jal shield left
   };
   let rollT = 0, rollCd = 0, rollX = 0, rollZ = 0;
   let attackT = 0, attackCd = 0, stepT = 0, toolCd = 0;
@@ -61,6 +67,7 @@ export function createPlayer(game) {
     player.facing = facing;
     player.burst = 0;
     player.shaktiCooldowns.fill(0);
+    player.shieldT = 0; root.rotation.x = 0;
     rollT = rollCd = attackT = attackCd = dashT = 0;
     player.rolling = false;
     tilt.rotation.set(0, 0, 0); tilt.scale.setScalar(1);
@@ -127,7 +134,7 @@ export function createPlayer(game) {
     if (player.shaktiCooldowns[i] > 0) return;
     player.shaktiCooldowns[i] = s.cooldown;
     const a = aimAngle(), ax = Math.sin(a), az = Math.cos(a);
-    if (s.kind !== 'heal') player.facing = a;
+    if (s.kind !== 'shield') player.facing = a;
     const chest = new THREE.Vector3(pos.x, pos.y + 1.2, pos.z);
 
     if (s.kind === 'dash') {            // wind dash: rush forward, shove everything nearby aside
@@ -140,8 +147,9 @@ export function createPlayer(game) {
     } else if (s.kind === 'projectile') {
       game.combat.fire({ x: chest.x + ax * 0.6, y: chest.y, z: chest.z + az * 0.6, dx: ax, dz: az,
         speed: s.speed, damage: s.damage, team: 'player', color: s.color, radius: 0.7 });
-    } else if (s.kind === 'heal') {
-      health.heal(s.amount);
+    } else if (s.kind === 'shield') {   // water shield: blocks hits for a few seconds and heals a little
+      player.shieldT = s.duration;
+      health.heal(s.heal);
       game.combat.ring(pos, s.color, 2.5, 0.5);
     } else if (s.kind === 'bolt') {     // instant hit on the best target in front
       let best = null, bd = s.range;
@@ -183,7 +191,17 @@ export function createPlayer(game) {
   }
 
   // Used by vehicles (the boat): put Veer somewhere without running the foot controller.
-  player.setPose = (x, y, z, facing) => { pos.set(x, y, z); player.facing = facing; player.moving = false; sync(); };
+  // lean tips the body forward (swimming).
+  player.setPose = (x, y, z, facing, lean = 0) => { pos.set(x, y, z); player.facing = facing; player.moving = false; sync(); root.rotation.x = lean; };
+  player.useShakti = () => useShakti();
+
+  // Runs every frame in every mode (on foot, in the boat, swimming): timers that must never stop.
+  player.tick = (dt) => {
+    for (let i = 0; i < 5; i++) player.shaktiCooldowns[i] = Math.max(0, player.shaktiCooldowns[i] - dt);
+    player.shieldT = Math.max(0, player.shieldT - dt);
+    shield.visible = player.shieldT > 0;
+    if (shield.visible) shield.scale.setScalar(1 + Math.sin(performance.now() * 0.012) * 0.05);
+  };
 
   function sync() {
     root.position.copy(pos);
@@ -193,7 +211,6 @@ export function createPlayer(game) {
   player.update = (dt) => {
     const { input, world, rig } = game;
     rollCd -= dt; attackCd -= dt; toolCd -= dt;
-    for (let i = 0; i < 5; i++) player.shaktiCooldowns[i] = Math.max(0, player.shaktiCooldowns[i] - dt);
     if (health.dead) return;
 
     for (let i = 0; i < 5; i++) if (input.take(`shakti${i + 1}`)) player.selectShakti(i);

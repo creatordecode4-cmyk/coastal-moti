@@ -7,6 +7,7 @@ const SIZE = 800;
 // segment count comes from the quality preset, colours and wave size from the environment.
 export function createSea(segments) {
   const material = new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,   // divers see the surface from below
     uniforms: {
       uTime: { value: 0 },
       uAmp: { value: 0.22 },

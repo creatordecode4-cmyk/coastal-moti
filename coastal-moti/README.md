@@ -3,10 +3,10 @@
 An original 3D third-person action-adventure for the browser, set on the Konkan coast.
 Story campaign + a battle mode against bots. Runs on phones (touch) and PC (keyboard + mouse).
 
-Last updated: 11 November 2026 (Mission 2 added)
+Last updated: 11 November 2026 (Mission 3 added)
 
-**Status: Missions 0, 1 and 2 are playable** with placeholder art ("Andhera", "Hawa ka Rukh", "Aaina",
-roughly 4-6 minutes each). Mission 3 is only a placeholder card.
+**Status: Missions 0, 1, 2 and 3 are playable** with placeholder art ("Andhera", "Hawa ka Rukh", "Aaina",
+"Gehri Saans", roughly 4-6 minutes each). Mission 4 is only a placeholder card.
 
 ## Controls
 
@@ -24,6 +24,10 @@ roughly 4-6 minutes each). Mission 3 is only a placeholder card.
 | Pause | Esc or P | pause button |
 
 The scheme is picked automatically (touch devices get the joystick and buttons).
+
+**Swimming (Mission 3):** the stick / WASD moves Veer where the camera looks, so look down and push forward
+to dive. Space or the Dodge button swims straight up, C straight down. Attack is a takedown when a diver has
+not seen Veer. Hold Tool for hold actions (open an oyster, share breath).
 
 **Sailing (Mission 1):** forward (W / stick up) raises the sail, left and right steer, back (S / stick down)
 rows backward, letting go drops the sail. The HUD dial shows where the wind comes from; the red wedge is
@@ -74,8 +78,9 @@ src/
   game.js             wires all systems together and runs the frame loop
   engine/
     engine.js         renderer, scene, lights, loop, quality + environment switching
-    environments.js   look presets: ENV_DAY, ENV_STORM_NIGHT, ENV_SEA_NIGHT, ENV_DAWN (sky, sun, sea, fog, rain)
+    environments.js   look presets: day, storm night, sea night, dawn, barge day, underwater
     boat.js           Dadaji's sailing boat: wind, points of sail, tacking, wave bobbing
+    swim.js           3D swimming with a breath meter and air pockets
     weather.js        rain (one draw call, animated in the shader) and lightning
     world.js          level loader + builder helpers + collision / line-of-sight API
     player.js         third-person controller: walk, run, dodge-roll, attack, Shakti, Burst, Tool
@@ -85,6 +90,7 @@ src/
     seepgaon.js       the village, the hill and the Diya-Ghar lighthouse (storm night)
     openSea.js        open water with sea rocks, and the island with the Teen-Ungli Chattan
     temple.js         the broken temple-lighthouse: courtyard, three mirrors, sunbeam, door, lamp
+    barge.js          under the salvage barge: sea bed, wreck, air pockets, oysters, fish, god-rays
     testArena.js      daytime combat test island
   ai/
     guard.js          stealth guard: fixed waypoint route, torch vision cone, hearing
@@ -92,13 +98,16 @@ src/
     sniper.js         rooftop sniper: aims while he has line of sight, cover and dust break it
     drone.js          Damini's drone: fixed loop with a scanner circle on the ground
     neelu.js          Neelu the kingfisher: flies to where the player should look next
+    diver.js          enemy diver: 3D waypoint route, short torch cone, chase and strike, takedown
+    ally.js           scripted squad ally (Damini / "Cheel"): follows, drone marks enemies, radio call-outs
     bot.js            combat bot: patrol, investigate, chase, shoot, cover
   missions/
     missionManager.js mission flow, objectives, checkpoints, scripts, saving
     andhera.js        Mission 0 "Andhera"
     hawaKaRukh.js     Mission 1 "Hawa ka Rukh"
     aaina.js          Mission 2 "Aaina"
-    mission3Placeholder.js
+    gehriSaans.js     Mission 3 "Gehri Saans"
+    mission4Placeholder.js
     systemsCheck.js   combat test mission (developer only)
   ui/                 hud.js, touchControls.js, pauseMenu.js, missionCard.js, radio.js, overlays.js,
                       compassTutorial.js, letter.js, *.css
@@ -169,10 +178,43 @@ Checkpoints: `gate` (inside the courtyard), `door` (puzzle solved, Agni unlocked
 Flags: `raniNishaan2`, `agniTutorialDone`, `hasDadajiLetter3`.
 Veer slowly recovers health after six seconds without being hit (this mission only).
 
+## Mission 3 "Gehri Saans" (14:00 · Underwater beneath the Kaala Jaal salvage barge)
+
+Starts by itself when Mission 2 ends.
+
+1. **Dive beneath the barge.** Lullaby line 3 plays. Breath (about 38 seconds) drains under water and refills
+   at the surface and in two air pockets (an upturned boat, a rock arch). Below 25 % the bar pulses red, the
+   screen edge darkens and a banner warns; at zero Veer loses health each second (not an instant fail).
+2. **Find three oysters** with Rani Chandravati's mark, in any order: hold Tool for 1.5 seconds to open one.
+   Three divers swim fixed 3D routes with short torch cones. Attack from behind is a silent takedown; a diver
+   who has seen Veer chases and strikes for a few seconds, and fighting him takes three hits.
+3. **Free Damini.** She is caught in a net; Baaz leaves her on the radio. Cut the net with three timed presses
+   (marker on the green zone), then hold Tool to give her Veer's breath. She follows him up.
+4. On the surface she changes sides and joins the squad as "Cheel". The **Jal Shakti** is unlocked and saved:
+   a water shield that blocks hits for 4 seconds and heals 15. A gunman on the barge opens fire; Cheel's drone
+   marks him and she calls his position; the tutorial makes the player raise the shield once.
+5. Dadaji's fourth letter at his boat, a one-line card, then the Mission 4 placeholder card.
+
+Checkpoints: `oysters` (remembers which oysters are open), `net`, `surface`.
+Flags: `m3Oysters`, `raniNishaan3`, `sharedBreath`, `daminiJoined`, `jalTutorialDone`, `hasDadajiLetter4`.
+
+### Using Damini ("Cheel") in later missions
+
+```js
+import { createAlly } from '../ai/ally.js';
+const cheel = createAlly(game, { name: 'Cheel', x, z });   // add y and cheel.swimming = true under water
+cheel.setMode('follow');                 // or 'stay', 'trapped'; cheel.goTo({ x, z }) walks to a spot
+cheel.drone.visible = true;
+cheel.enemies = () => game.bots.map((b) => ({ pos: b.pos, label: 'Guard' }));
+cheel.autoMark = true;                   // drone marks the nearest enemy; she calls "Guard. North-east. 20 metres."
+// every frame: cheel.update(dt);   on reset: cheel.dispose();
+```
+
 ## Replaying and jumping to a mission
 
 - Pause menu -> "Reset all progress" starts again from Mission 0.
-- Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`, `?mission=m2_aaina`.
+- Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`, `?mission=m2_aaina`,
+  `?mission=m3_gehri_saans`.
 - Developer only: `?mission=t0_systems_check` opens the daytime combat test arena.
 
 ## How to add a mission
@@ -211,6 +253,8 @@ To swap in a real file: `game.audio.load('attack', 'assets/audio/attack.ogg')`, 
 - Patrol boats do not avoid each other and only check line of sight against sea rocks.
 - The sniper's line of sight is the same simple 2D check: anything tall hides Veer, even though the sniper stands on a roof.
 - Damini's "race" for the door is told through radio lines only; she cannot win it yet.
+- Under water, line of sight is still the flat 2D check plus a height limit; only the Jal shield works there (no Vayu or Agni).
+- The ally follows in a straight line (no path-finding) and does not fight; her drone only marks.
 - Guards never leave their routes (by design for this mission) and do not search for the player.
 - Line of sight is checked in 2D against walls, houses and tall stacks; low props do not hide Veer.
 - Combat bots (test arena) still have no path-finding.

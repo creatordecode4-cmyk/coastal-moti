@@ -14,7 +14,8 @@ export function createCameraRig(game) {
 
   // rig.autoYaw: when set (radians), the camera swings behind that direction unless the player is looking around.
   rig.autoYaw = null;
-  rig.resetFollow = () => { rig.autoYaw = null; rig.distance = baseDistance; };
+  rig.underwater = false;   // swimming: the camera may go below sea level and look steeply up or down
+  rig.resetFollow = () => { rig.autoYaw = null; rig.distance = baseDistance; rig.underwater = false; };
 
   rig.snap = () => { snapped = false; };
 
@@ -36,7 +37,7 @@ export function createCameraRig(game) {
     if (live) {
       const look = game.input.lookDelta();
       rig.yaw -= look.x;
-      rig.pitch = clamp(rig.pitch + look.y, -0.15, 1.2);
+      rig.pitch = clamp(rig.pitch + look.y, rig.underwater ? -1.25 : -0.15, rig.underwater ? 1.3 : 1.2);
       if (look.x || look.y) manualT = 2.5; else manualT -= dt;
       if (rig.autoYaw !== null && manualT <= 0) rig.yaw = lerpAngle(rig.yaw, rig.autoYaw, damp(1.8, dt));
     }
@@ -54,7 +55,8 @@ export function createCameraRig(game) {
     dist += (want - dist) * (want < dist ? 1 : damp(6, dt)); // snap in, ease out
 
     camera.position.set(target.x + ox * dist, target.y + oy * dist, target.z + oz * dist);
-    const ground = Math.max(game.world.heightAt(camera.position.x, camera.position.z), 0) + 0.5;
+    const floor = game.world.heightAt(camera.position.x, camera.position.z);
+    const ground = (rig.underwater ? floor : Math.max(floor, 0)) + 0.5;
     if (camera.position.y < ground) camera.position.y = ground;
     camera.lookAt(target);
   };

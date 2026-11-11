@@ -64,7 +64,7 @@ export function enableTouchControls(input) {
       input.press(btn.dataset.action);
       btn.classList.add('down');
     });
-    const up = () => btn.classList.remove('down');
+    const up = () => { btn.classList.remove('down'); input.release(btn.dataset.action); };
     btn.addEventListener('pointerup', up);
     btn.addEventListener('pointercancel', up);
     btn.addEventListener('pointerleave', up);
