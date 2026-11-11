@@ -53,3 +53,13 @@ export const ENV_UNDERWATER = {
   fog: { color: 0x0e4a66, near: 3, far: 58 },
   rain: 0, lightning: false, ambientSound: 'storm',
 };
+
+// Amavasya: the new-moon night at the sea-fort. No moon, clear sky, stars. Torches do the lighting.
+export const ENV_FORT_NIGHT = {
+  zenith: 0x03050b, horizon: 0x0f1a2a, sun: 0x8fa6c8, sunDisc: 0,
+  sunDir: [-0.3, 0.8, 0.4],
+  hemi: [0x93a8cc, 0x2a2d38, 1.0], sunIntensity: 0.55,
+  sea: { deep: 0x040d16, shallow: 0x15394d, amp: 0.3, speed: 1.2 },
+  fog: { color: 0x0f1a2a, near: 30, far: 190 },
+  rain: 0, lightning: false, ambientSound: 'storm',
+};

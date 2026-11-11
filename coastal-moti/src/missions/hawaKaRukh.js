@@ -27,6 +27,7 @@ export const hawaKaRukh = {
   location: 'Open sea',
   time: '02:15',
   level: 'openSea',
+  grants: 'vayu',
   objectives: [
     { id: 'sail', text: 'Reach the island unseen', target: S.landing },
     { id: 'chattan', text: 'Find the Teen-Ungli Chattan', target: S.chattan },

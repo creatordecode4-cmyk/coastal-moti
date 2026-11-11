@@ -28,6 +28,7 @@ export function createWorld(scene) {
 
   // ---- builder: what a level uses to construct itself ----------------------
   const builder = {
+    world: null,    // set below: levels may remove colliders (gates)
     camera: null,   // set by the game: levels use it for effects that follow the view
     rand: Math.random,
     heightAt: (x, z) => heightFn(x, z),
@@ -121,6 +122,8 @@ export function createWorld(scene) {
     },
   };
 
+  builder.world = world;
+
   function unload() {
     for (const obj of owned) {
       scene.remove(obj);
@@ -145,6 +148,8 @@ export function createWorld(scene) {
     buildCoverPoints();
   };
   world.update = (dt, time) => world.level.update?.(dt, time);
+  // Take a collider away (a gate that opens). Cover points are not rebuilt.
+  world.removeCollider = (col) => { const i = world.colliders.indexOf(col); if (i >= 0) world.colliders.splice(i, 1); };
   world.setCamera = (camera) => { builder.camera = camera; };
 
   // ---- collision API -------------------------------------------------------

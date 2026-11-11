@@ -4,7 +4,7 @@ export const SHAKTIS = [
   { id: 'vayu',   name: 'Vayu',   element: 'wind',      color: 0xbfe9e0, cooldown: 3.0, kind: 'dash',       damage: 12, range: 5, push: 11 }, // wind dash: pushes enemies, blows dust away
   { id: 'agni',   name: 'Agni',   element: 'fire',      color: 0xff7a2f, cooldown: 2.5, kind: 'projectile', damage: 30, speed: 22 }, // fire burst: burns enemies, lights lamps
   { id: 'jal',    name: 'Jal',    element: 'water',     color: 0x3fa9f5, cooldown: 7.0, kind: 'shield',     duration: 4, heal: 15 }, // water shield: blocks bullets, heals a little
-  { id: 'bijli',  name: 'Bijli',  element: 'lightning', color: 0xf7e463, cooldown: 4.0, kind: 'bolt',       damage: 40, range: 16 },
+  { id: 'bijli',  name: 'Bijli',  element: 'lightning', color: 0xf7e463, cooldown: 5.0, kind: 'chain',      damage: 18, range: 13, targets: 3, stun: 2.5 }, // lightning chain: jumps to 3 enemies, stuns them
   { id: 'dharti', name: 'Dharti', element: 'earth',     color: 0xb98a55, cooldown: 6.0, kind: 'aoe',        damage: 28, range: 5 },
 ];
 

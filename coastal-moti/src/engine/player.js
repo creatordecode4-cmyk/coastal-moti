@@ -151,16 +151,19 @@ export function createPlayer(game) {
       player.shieldT = s.duration;
       health.heal(s.heal);
       game.combat.ring(pos, s.color, 2.5, 0.5);
-    } else if (s.kind === 'bolt') {     // instant hit on the best target in front
-      let best = null, bd = s.range;
-      for (const b of livingBots()) {
-        const d = distTo(b);
-        if (d < bd && Math.abs(angleDiff(a, angleTo(b))) < 0.6 && game.world.lineOfSight(pos.x, pos.z, b.pos.x, b.pos.z)) { bd = d; best = b; }
+    } else if (s.kind === 'chain') {    // lightning jumps from enemy to enemy and stuns them
+      const targets = livingBots()
+        .filter((b) => distTo(b) < s.range && game.world.lineOfSight(pos.x, pos.z, b.pos.x, b.pos.z))
+        .sort((p, q) => distTo(p) - distTo(q)).slice(0, s.targets);
+      let from = chest;
+      for (const b of targets) {
+        const end = new THREE.Vector3(b.pos.x, b.pos.y + 1.1, b.pos.z);
+        game.combat.beam(from, end, s.color, 0.22);
+        game.damageBot(b, s.damage);
+        b.stun?.(s.stun);
+        from = end;
       }
-      const end = best ? new THREE.Vector3(best.pos.x, best.pos.y + 1.1, best.pos.z)
-                       : new THREE.Vector3(chest.x + ax * s.range, chest.y, chest.z + az * s.range);
-      game.combat.beam(chest, end, s.color);
-      if (best) game.damageBot(best, s.damage);
+      if (!targets.length) game.combat.beam(chest, new THREE.Vector3(chest.x + ax * 7, chest.y, chest.z + az * 7), s.color, 0.22);
     } else if (s.kind === 'aoe') {
       areaDamage(s.range, s.damage);
       game.combat.ring(pos, s.color, s.range, 0.45);

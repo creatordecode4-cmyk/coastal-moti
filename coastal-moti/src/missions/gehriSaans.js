@@ -26,6 +26,7 @@ export const gehriSaans = {
   location: 'Underwater beneath the Kaala Jaal salvage barge',
   time: '14:00',
   level: 'barge',
+  grants: 'jal',
   objectives: [
     { id: 'dive', text: 'Dive beneath the barge', target: B.underBarge },
     { id: 'oysters', text: 'Find three oysters (0/3)' },

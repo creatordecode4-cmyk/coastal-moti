@@ -14,13 +14,17 @@ import { andhera } from './missions/andhera.js';
 import { hawaKaRukh } from './missions/hawaKaRukh.js';
 import { aaina } from './missions/aaina.js';
 import { gehriSaans } from './missions/gehriSaans.js';
-import { mission4Placeholder } from './missions/mission4Placeholder.js';
+import { amavasya } from './missions/amavasya.js';
+import { mission5Placeholder } from './missions/mission5Placeholder.js';
 import { systemsCheck } from './missions/systemsCheck.js';
 import { testArena } from './levels/testArena.js';
 import { seepgaon } from './levels/seepgaon.js';
 import { openSea } from './levels/openSea.js';
 import { temple } from './levels/temple.js';
 import { barge } from './levels/barge.js';
+import { seaFort } from './levels/seaFort.js';
+import { createStarDial } from './ui/starDial.js';
+import { createMuralPanel } from './ui/mural.js';
 import { createOverlays } from './ui/overlays.js';
 import { createCompassTutorial } from './ui/compassTutorial.js';
 import { createLetter } from './ui/letter.js';
@@ -32,7 +36,7 @@ import { enableTouchControls } from './ui/touchControls.js';
 import { showControlsHint } from './ui/controlsHint.js';
 
 const XP_PER_BOT = 40, XP_PER_LEVEL = 100;
-const LEVELS = { testArena, seepgaon, openSea, temple, barge };
+const LEVELS = { testArena, seepgaon, openSea, temple, barge, seaFort };
 
 // Wires every system together. `game` is the shared context that systems receive.
 export function createGame({ canvas, mobile, settings, devMission = null }) {
@@ -61,6 +65,8 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
   game.card = createMissionCard(mobile);
   game.compassTutorial = createCompassTutorial(game);
   game.letter = createLetter();
+  game.starDial = createStarDial(game);
+  game.muralPanel = createMuralPanel();
   Object.assign(game, createOverlays()); // fade, toast, banner, showAlert, hideAlert, setCinematic
   game.missions = createMissionManager(game);
   game.pauseMenu = createPauseMenu(game);
@@ -84,8 +90,9 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
   };
 
   // Levels: build the world and apply its sky, sea, fog, weather and background sound.
-  game.loadLevel = (id) => {
-    if (game.world.id === id) return;
+  // force = true rebuilds a level that is already loaded (missions that change its colliders).
+  game.loadLevel = (id, force = false) => {
+    if (game.world.id === id && !force) return;
     const def = LEVELS[id];
     game.world.load(def);
     engine.setEnvironment(def.env);
@@ -163,6 +170,8 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
     game.hideAlert();
     game.compassTutorial.close();
     game.letter.close();
+    game.starDial.close();
+    game.muralPanel.close();
     document.getElementById('down').hidden = true;
   };
 
@@ -245,7 +254,8 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
   game.missions.register(hawaKaRukh);
   game.missions.register(aaina);
   game.missions.register(gehriSaans);
-  game.missions.register(mission4Placeholder);
+  game.missions.register(amavasya);
+  game.missions.register(mission5Placeholder);
   // Jump links: ?mission=<id> starts at that mission, for example ?mission=m3_gehri_saans.
   // ?mission=t0_systems_check loads the combat test arena.
   if (devMission === systemsCheck.id) game.missions.register(systemsCheck);

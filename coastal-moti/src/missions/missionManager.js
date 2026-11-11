@@ -5,6 +5,7 @@
 //     level: 'seepgaon',                       // which level to load (src/levels/)
 //     objectives: [{ id: 'reach', text: 'Reach the gate', target: { x: 0, z: 0 } }, ...],
 //     endLine: 'One line shown on a black card when the mission ends.',   // optional
+//     grants: 'vayu',                          // optional: the Shakti this mission awards
 //     start(ctx, checkpoint) {},  // set up the world. checkpoint = id saved by ctx.checkpoint(), or null
 //     update(ctx, dt)        {},  // every frame: check conditions, call ctx.completeObjective(id)
 //     complete(ctx)          {},  // rewards and closing radio lines
@@ -106,7 +107,14 @@ export function createMissionManager(game) {
     if (!card) { await game.fade(true, 250); if (my !== token) return; }
 
     game.resetActors();
-    game.loadLevel(mission.level || 'testArena');
+    game.loadLevel(mission.level || 'testArena', !!mission.reloadLevel);
+    // A mission can name the Shakti it awards (`grants`). Starting a mission (also through a
+    // ?mission= jump link) makes sure every Shakti from the missions before it is unlocked.
+    if (!mission.noGrants) {
+      for (const earlier of missions.slice(0, missions.indexOf(mission))) {
+        if (earlier.grants && !game.progress.unlockedShaktis.includes(earlier.grants)) game.progress.unlockedShaktis.push(earlier.grants);
+      }
+    }
     objectives = mission.objectives.map((o) => ({ ...o, done: false }));
     current = objectives[0] || null;
     game.setObjectiveTarget(current?.target ?? null);

@@ -11,7 +11,7 @@ import { damp, lerpAngle } from '../engine/mathx.js';
 //                                                  seconds and the ally calls its position on the radio
 // Radio call-outs are generated from compass direction and distance: always under 12 words.
 
-const FOLLOW_DIST = 2.6, WALK_SPEED = 5.2, SWIM_SPEED = 3.4;
+const SIDE = 2.3, WALK_SPEED = 6.6, SWIM_SPEED = 3.9;
 const DIRS = ['North', 'North-east', 'East', 'South-east', 'South', 'South-west', 'West', 'North-west'];
 
 export function compassWord(dx, dz) {              // north is -Z, east is +X
@@ -80,7 +80,15 @@ export function createAlly(game, { name = 'Cheel', x, y = null, z, color = 0xd95
     let goal = null;
     if (ally.mode === 'follow') {
       const d = Math.hypot(p.x - pos.x, p.z - pos.z, ally.swimming ? p.y - pos.y : 0);
-      if (d > FOLLOW_DIST) goal = { x: p.x, y: ally.swimming ? p.y : null, z: p.z, stop: FOLLOW_DIST };
+      if (d > 15) {   // stuck behind a wall somewhere: catch up in one jump
+        const r = game.rig.right();              // beside Veer, not between him and the camera
+        pos.set(p.x + r.x * 2.2, p.y, p.z + r.z * 2.2);
+      } else {
+        // Her spot is beside Veer, to the camera's right, so she never blocks the view.
+        const r = game.rig.right(), f = game.rig.forward();
+        const sx = p.x + r.x * SIDE - f.x * 0.6, sz = p.z + r.z * SIDE - f.z * 0.6;
+        if (Math.hypot(sx - pos.x, sz - pos.z, ally.swimming ? p.y - pos.y : 0) > 1.1) goal = { x: sx, y: ally.swimming ? p.y : null, z: sz, stop: 0.5 };
+      }
     } else if (ally.mode === 'goto' && dest) goal = { ...dest, stop: 0.4 };
 
     if (goal) {
@@ -120,7 +128,7 @@ export function createAlly(game, { name = 'Cheel', x, y = null, z, color = 0xd95
       m.icon.position.set(q.x, q.y + (m.target.markHeight ?? 2.6), q.z);
       m.icon.rotation.y += dt * 2.5;
       m.mat.opacity = Math.min(1, m.t);
-      if (m.t <= 0 || m.target.gone) { game.scene.remove(m.icon); m.mat.dispose(); m.icon.children.forEach((c) => c.geometry.dispose()); ally.marks.splice(i, 1); }
+      if (m.t <= 0 || m.target.gone || m.target.health?.dead) { game.scene.remove(m.icon); m.mat.dispose(); m.icon.children.forEach((c) => c.geometry.dispose()); ally.marks.splice(i, 1); }
     }
   };
 

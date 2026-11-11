@@ -15,6 +15,7 @@ export const systemsCheck = {
   location: 'Seepgaon Beach',
   time: '06:10',
   level: 'testArena',
+  noGrants: true,   // the combat test starts with nothing unlocked
   objectives: [
     { id: 'move', text: 'Reach the marker on the beach', target: MARKER },
     { id: 'clear', text: 'Clear the training bots' },

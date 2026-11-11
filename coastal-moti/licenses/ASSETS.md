@@ -23,6 +23,7 @@ Format: `name | author | URL | license | where it is used`
 - Placeholder sound effects, storm ambience and thunder (`src/audio/audio.js`) | project team | – | original | synthesized with the Web Audio API, no files
 - Compass dial, half-map drawing and Dadaji's letter (`index.html`, `src/ui/`) | project team | – | original | Mission 0 interface
 - Wind dial (`index.html`, `src/ui/hud.js`) | project team | – | original | Mission 1 interface
+- Star dial and the five mural pictures (`src/ui/starDial.js`, `src/missions/amavasyaMurals.js`) | project team | – | original | Mission 4 puzzle and story panels, drawn as inline SVG
 - Lullaby line "Teen ungli jab suraj ko roke, hawa se poochh kinara kahan." and all dialogue | project team | – | original | story text
 
 ## Free assets to add later (suggested sources, all CC0 — check each pack's page again when downloading)

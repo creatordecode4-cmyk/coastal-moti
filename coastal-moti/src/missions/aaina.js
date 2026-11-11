@@ -58,6 +58,7 @@ export const aaina = {
   location: 'Broken temple-lighthouse',
   time: '06:30',
   level: 'temple',
+  grants: 'agni',
   objectives: [
     { id: 'reach', text: 'Reach the temple', target: T.gate },
     { id: 'mirrors', text: 'Align the mirrors: sunbeam to the door' },
@@ -76,9 +77,7 @@ export const aaina = {
     this.hintStage = 0; this.dust = []; this.lastHurt = -99; this.scanCool = 0;
     this.toolPressed = false; this.shakti = null;
 
-    // Aaina needs Vayu (earned in Mission 1). If the player jumped straight here, grant it.
-    if (!game.progress.unlockedShaktis.includes('vayu')) { game.progress.unlockedShaktis.push('vayu'); game.persist(); }
-    game.player.currentShakti = 0;
+    game.player.currentShakti = 0;   // Vayu (the mission manager grants earlier Shaktis on jump links)
 
     // Level state.
     T.mirrors.forEach((m, i) => level.mirrors[i].set(solved ? m.solution : m.initial));

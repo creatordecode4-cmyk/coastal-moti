@@ -82,6 +82,10 @@ export function createBot(game, { x, z, patrol = [], hp = 60 }) {
   };
 
   bot.push = (vx, vz) => { knock.x += vx; knock.z += vz; };
+  // Stunned bots stand frozen and cannot see, move or shoot.
+  let stunT = 0;
+  bot.stun = (seconds) => { stunT = Math.max(stunT, seconds); };
+  Object.defineProperty(bot, 'stunned', { get: () => stunT > 0 });
 
   health.onDamage = () => {
     flashT = 0.12;
@@ -157,6 +161,15 @@ export function createBot(game, { x, z, patrol = [], hp = 60 }) {
     if (knock.lengthSq() > 0.01) {
       world.move(pos, knock.x * dt, knock.z * dt, RADIUS);
       knock.multiplyScalar(Math.exp(-6 * dt));
+    }
+
+    if (stunT > 0) {
+      stunT -= dt;
+      pos.y += (world.heightAt(pos.x, pos.z) - pos.y) * damp(20, dt);
+      root.position.copy(pos);
+      bodyMat.emissive.setHex(Math.sin(performance.now() * 0.03) > 0 ? 0x8a7a1a : 0x222200);
+      bar.quaternion.copy(game.engine.camera.quaternion);
+      return;
     }
 
     // ---- senses ----

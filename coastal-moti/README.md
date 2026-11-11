@@ -3,10 +3,10 @@
 An original 3D third-person action-adventure for the browser, set on the Konkan coast.
 Story campaign + a battle mode against bots. Runs on phones (touch) and PC (keyboard + mouse).
 
-Last updated: 11 November 2026 (Mission 3 added)
+Last updated: 11 November 2026 (Mission 4 added)
 
-**Status: Missions 0, 1, 2 and 3 are playable** with placeholder art ("Andhera", "Hawa ka Rukh", "Aaina",
-"Gehri Saans", roughly 4-6 minutes each). Mission 4 is only a placeholder card.
+**Status: Missions 0 to 4 are playable** with placeholder art ("Andhera", "Hawa ka Rukh", "Aaina",
+"Gehri Saans", "Amavasya", roughly 4-8 minutes each). Mission 5 is only a placeholder card.
 
 ## Controls
 
@@ -91,6 +91,7 @@ src/
     openSea.js        open water with sea rocks, and the island with the Teen-Ungli Chattan
     temple.js         the broken temple-lighthouse: courtyard, three mirrors, sunbeam, door, lamp
     barge.js          under the salvage barge: sea bed, wreck, air pockets, oysters, fish, god-rays
+    seaFort.js        the sea-fort: water tunnel, star-dial court, mural hall, radio tower yard
     testArena.js      daytime combat test island
   ai/
     guard.js          stealth guard: fixed waypoint route, torch vision cone, hearing
@@ -107,10 +108,11 @@ src/
     hawaKaRukh.js     Mission 1 "Hawa ka Rukh"
     aaina.js          Mission 2 "Aaina"
     gehriSaans.js     Mission 3 "Gehri Saans"
-    mission4Placeholder.js
+    amavasya.js       Mission 4 "Amavasya" (+ amavasyaMurals.js: the five mural pictures)
+    mission5Placeholder.js
     systemsCheck.js   combat test mission (developer only)
   ui/                 hud.js, touchControls.js, pauseMenu.js, missionCard.js, radio.js, overlays.js,
-                      compassTutorial.js, letter.js, *.css
+                      compassTutorial.js, letter.js, starDial.js, mural.js, *.css
   audio/audio.js      sound hooks (synthesized placeholder sounds, storm ambience, thunder)
   save/               save.js (progress, checkpoint, flags), settings.js (quality, sound)
 assets/               icons/ (original) · models/ textures/ audio/ are still empty
@@ -210,11 +212,38 @@ cheel.autoMark = true;                   // drone marks the nearest enemy; she c
 // every frame: cheel.update(dt);   on reset: cheel.dispose();
 ```
 
+## Mission 4 "Amavasya" (00:00 · The sea-fort)
+
+Starts by itself when Mission 3 ends. New-moon night; Damini ("Cheel") is an ally from the first second.
+
+1. **Water tunnel:** the Coast Guard draws fire at the main gate (radio, and flashes in the east) while Veer
+   and Cheel dive under the sea wall, swim the tunnel and come up in the pool inside.
+2. **Star dial:** three rings, six positions each, each with a piece of a constellation. All three marks must
+   sit under the fixed star. The rings are linked: the outer ring drags the middle one, the middle ring drags
+   the inner one. Hints (on the dial and from Cheel) after 60 and 120 seconds at the dial. Solving it opens
+   the inner gate.
+3. **Mural hall:** five murals, read in order. Each plays as a short animated 2D panel with one caption.
+   The fifth is the twist: the Chandramoti was never treasure, it was the light of the Diya-Ghar
+   (flag `pearlIsTheLight`). Dadaji's fifth letter is under the last mural.
+4. **Baaz** takes the radio tower and the Coast Guard's radio dies (flag `commsCut`). He is only ever a voice
+   on the radio and a far-off shape on the tower.
+5. **Capture the tower:** two waves of three guards. Cheel's drone marks them and she calls their positions.
+6. **Reward:** touching the mark on the tower lights the fourth Rani Nishaan and unlocks **Bijli** (saved): a
+   lightning chain that hits up to three guards within 13 m and stuns them for 2.5 seconds. Tutorial: face the
+   tower's power box and use Bijli once. The power dies, the Coast Guard radio comes back.
+7. One-line card, then the Mission 5 placeholder card.
+
+Checkpoints: `court`, `hall`, `tower`, `power`. The fort is rebuilt on every (re)start because its gates
+lose their colliders when they open.
+Flags: `pearlIsTheLight`, `hasDadajiLetter5`, `commsCut`, `raniNishaan4`, `bijliTutorialDone`.
+
 ## Replaying and jumping to a mission
 
 - Pause menu -> "Reset all progress" starts again from Mission 0.
 - Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`, `?mission=m2_aaina`,
-  `?mission=m3_gehri_saans`.
+  `?mission=m3_gehri_saans`, `?mission=m4_amavasya`.
+- A jump link starts the mission with every Shakti earned in the missions before it (each mission names its
+  reward in `grants`), so every mission is playable on its own.
 - Developer only: `?mission=t0_systems_check` opens the daytime combat test arena.
 
 ## How to add a mission
@@ -254,7 +283,9 @@ To swap in a real file: `game.audio.load('attack', 'assets/audio/attack.ogg')`, 
 - The sniper's line of sight is the same simple 2D check: anything tall hides Veer, even though the sniper stands on a roof.
 - Damini's "race" for the door is told through radio lines only; she cannot win it yet.
 - Under water, line of sight is still the flat 2D check plus a height limit; only the Jal shield works there (no Vayu or Agni).
-- The ally follows in a straight line (no path-finding) and does not fight; her drone only marks.
+- The ally follows in a straight line (no path-finding; she jumps to Veer's side if left 15 m behind) and does not fight; her drone only marks.
+- The Coast Guard's fight at the main gate is radio lines and distant flashes only.
+- Guard waves appear in place (no entrance animation); guards still have no path-finding.
 - Guards never leave their routes (by design for this mission) and do not search for the player.
 - Line of sight is checked in 2D against walls, houses and tall stacks; low props do not hide Veer.
 - Combat bots (test arena) still have no path-finding.

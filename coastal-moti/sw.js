@@ -1,6 +1,6 @@
 // Simple service worker: precache the app shell, then network-first with an offline fallback.
 // Bump CACHE_VERSION on every release so players get the new files.
-const CACHE_VERSION = 'coastal-moti-v0.6.0';
+const CACHE_VERSION = 'coastal-moti-v0.7.0';
 
 // App shell: everything needed to boot. Add new source files and assets here.
 const PRECACHE = [
@@ -38,15 +38,18 @@ const PRECACHE = [
   'src/game.js',
   'src/levels/barge.js',
   'src/levels/openSea.js',
+  'src/levels/seaFort.js',
   'src/levels/seepgaon.js',
   'src/levels/temple.js',
   'src/levels/testArena.js',
   'src/main.js',
   'src/missions/aaina.js',
+  'src/missions/amavasya.js',
+  'src/missions/amavasyaMurals.js',
   'src/missions/andhera.js',
   'src/missions/gehriSaans.js',
   'src/missions/hawaKaRukh.js',
-  'src/missions/mission4Placeholder.js',
+  'src/missions/mission5Placeholder.js',
   'src/missions/missionManager.js',
   'src/missions/systemsCheck.js',
   'src/save/save.js',
@@ -58,9 +61,11 @@ const PRECACHE = [
   'src/ui/hud.js',
   'src/ui/letter.js',
   'src/ui/missionCard.js',
+  'src/ui/mural.js',
   'src/ui/overlays.js',
   'src/ui/pauseMenu.js',
   'src/ui/radio.js',
+  'src/ui/starDial.js',
   'src/ui/touchControls.js',
   'assets/icons/icon.svg',
   'assets/icons/icon-192.png',
