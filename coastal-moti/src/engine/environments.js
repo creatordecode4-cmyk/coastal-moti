@@ -23,3 +23,13 @@ export const ENV_SEA_NIGHT = {
   fog: { color: 0x1d2b3b, near: 35, far: 210 },
   rain: 0.6,
 };
+
+// Dawn after the storm night: low sun in the east, warm haze, a last thin rain.
+export const ENV_DAWN = {
+  zenith: 0x2b4a78, horizon: 0xf0b07a, sun: 0xffd9a8, sunDisc: 1,
+  sunDir: [0.93, 0.2, 0.33],
+  hemi: [0xc9d6ea, 0x4f463a, 0.95], sunIntensity: 1.3,
+  sea: { deep: 0x123a50, shallow: 0x4a97a0, amp: 0.3, speed: 1.1 },
+  fog: { color: 0xe3a878, near: 45, far: 270 },
+  rain: 0.15, lightning: false, ambientSound: 'storm',
+};

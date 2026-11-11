@@ -12,11 +12,13 @@ import { loadProgress, saveProgress, clearProgress, freshProgress } from './save
 import { createMissionManager } from './missions/missionManager.js';
 import { andhera } from './missions/andhera.js';
 import { hawaKaRukh } from './missions/hawaKaRukh.js';
-import { mission2Placeholder } from './missions/mission2Placeholder.js';
+import { aaina } from './missions/aaina.js';
+import { mission3Placeholder } from './missions/mission3Placeholder.js';
 import { systemsCheck } from './missions/systemsCheck.js';
 import { testArena } from './levels/testArena.js';
 import { seepgaon } from './levels/seepgaon.js';
 import { openSea } from './levels/openSea.js';
+import { temple } from './levels/temple.js';
 import { createOverlays } from './ui/overlays.js';
 import { createCompassTutorial } from './ui/compassTutorial.js';
 import { createLetter } from './ui/letter.js';
@@ -28,7 +30,7 @@ import { enableTouchControls } from './ui/touchControls.js';
 import { showControlsHint } from './ui/controlsHint.js';
 
 const XP_PER_BOT = 40, XP_PER_LEVEL = 100;
-const LEVELS = { testArena, seepgaon, openSea };
+const LEVELS = { testArena, seepgaon, openSea, temple };
 
 // Wires every system together. `game` is the shared context that systems receive.
 export function createGame({ canvas, mobile, settings, devMission = null }) {
@@ -222,7 +224,8 @@ export function createGame({ canvas, mobile, settings, devMission = null }) {
   // ---- missions ------------------------------------------------------------
   game.missions.register(andhera);
   game.missions.register(hawaKaRukh);
-  game.missions.register(mission2Placeholder);
+  game.missions.register(aaina);
+  game.missions.register(mission3Placeholder);
   // Developer options: ?mission=<id> starts at that mission (for example ?mission=m1_hawa_ka_rukh).
   // ?mission=t0_systems_check loads the combat test arena.
   if (devMission === systemsCheck.id) game.missions.register(systemsCheck);

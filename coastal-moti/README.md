@@ -3,10 +3,10 @@
 An original 3D third-person action-adventure for the browser, set on the Konkan coast.
 Story campaign + a battle mode against bots. Runs on phones (touch) and PC (keyboard + mouse).
 
-Last updated: 11 November 2026
+Last updated: 11 November 2026 (Mission 2 added)
 
-**Status: Mission 0 "Andhera" and Mission 1 "Hawa ka Rukh" are playable** with placeholder art
-(about 4 minutes each). Mission 2 is only a placeholder card.
+**Status: Missions 0, 1 and 2 are playable** with placeholder art ("Andhera", "Hawa ka Rukh", "Aaina",
+roughly 4-6 minutes each). Mission 3 is only a placeholder card.
 
 ## Controls
 
@@ -74,7 +74,7 @@ src/
   game.js             wires all systems together and runs the frame loop
   engine/
     engine.js         renderer, scene, lights, loop, quality + environment switching
-    environments.js   look presets: ENV_DAY, ENV_STORM_NIGHT, ENV_SEA_NIGHT (sky, light, sea, fog, rain, lightning)
+    environments.js   look presets: ENV_DAY, ENV_STORM_NIGHT, ENV_SEA_NIGHT, ENV_DAWN (sky, sun, sea, fog, rain)
     boat.js           Dadaji's sailing boat: wind, points of sail, tacking, wave bobbing
     weather.js        rain (one draw call, animated in the shader) and lightning
     world.js          level loader + builder helpers + collision / line-of-sight API
@@ -84,16 +84,21 @@ src/
   levels/
     seepgaon.js       the village, the hill and the Diya-Ghar lighthouse (storm night)
     openSea.js        open water with sea rocks, and the island with the Teen-Ungli Chattan
+    temple.js         the broken temple-lighthouse: courtyard, three mirrors, sunbeam, door, lamp
     testArena.js      daytime combat test island
   ai/
     guard.js          stealth guard: fixed waypoint route, torch vision cone, hearing
     patrolBoat.js     smuggler speedboat: fixed route, sweeping searchlight, short chase
+    sniper.js         rooftop sniper: aims while he has line of sight, cover and dust break it
+    drone.js          Damini's drone: fixed loop with a scanner circle on the ground
+    neelu.js          Neelu the kingfisher: flies to where the player should look next
     bot.js            combat bot: patrol, investigate, chase, shoot, cover
   missions/
     missionManager.js mission flow, objectives, checkpoints, scripts, saving
     andhera.js        Mission 0 "Andhera"
     hawaKaRukh.js     Mission 1 "Hawa ka Rukh"
-    mission2Placeholder.js
+    aaina.js          Mission 2 "Aaina"
+    mission3Placeholder.js
     systemsCheck.js   combat test mission (developer only)
   ui/                 hud.js, touchControls.js, pauseMenu.js, missionCard.js, radio.js, overlays.js,
                       compassTutorial.js, letter.js, *.css
@@ -141,10 +146,33 @@ Starts by itself when Mission 0 ends.
 Checkpoints: `mid` (half-way, behind a rock), `island` (landed), `nishaan` (Vayu unlocked).
 Flags: `raniNishaan1`, `vayuTutorialDone`, `hasDadajiLetter2`.
 
+## Mission 2 "Aaina" (06:30 · Broken temple-lighthouse)
+
+Starts by itself when Mission 1 ends. Dawn.
+
+1. **Reach the temple:** two Kaala Jaal guards patrol the path (first real combat: Attack, Dodge, Vayu).
+   Damini ("Cheel") speaks for the first time; her drone circles the courtyard.
+2. **Align the mirrors:** a sunbeam enters through a gap in the east wall. Three mirrors turn 22.5 degrees
+   per press of Tool; the beam is traced live as a glowing line and must reach the temple door.
+   - A **sniper** on the roof aims while he has line of sight (the HUD shows IN SIGHT and a meter);
+     crates, walls and the mirror stands break it. A dodge-roll slips a shot.
+   - The **drone** paints a scanner circle; touching it alerts the sniper, who then aims almost twice as fast.
+   - **Vayu** raises a dust cloud for 9 seconds: it hides Veer from both and makes the beam glow brightly.
+   - **Neelu** perches on the mirror that needs work. He never shows the angle.
+   - **Hints:** a small one after 60 seconds, a stronger one after 120 seconds (names the mirror and the
+     direction, not the number of turns), then one more every 60 seconds.
+3. **Light the lamp:** the door opens, the second Rani Nishaan lights and the **Agni Shakti** is unlocked and
+   saved. The tutorial makes the player face the temple lamp and use Agni once.
+4. Dadaji's third letter, a one-line card, then the Mission 3 placeholder card.
+
+Checkpoints: `gate` (inside the courtyard), `door` (puzzle solved, Agni unlocked).
+Flags: `raniNishaan2`, `agniTutorialDone`, `hasDadajiLetter3`.
+Veer slowly recovers health after six seconds without being hit (this mission only).
+
 ## Replaying and jumping to a mission
 
 - Pause menu -> "Reset all progress" starts again from Mission 0.
-- Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`.
+- Add `?mission=<id>` to the address to start at a mission: `?mission=m0_andhera`, `?mission=m1_hawa_ka_rukh`, `?mission=m2_aaina`.
 - Developer only: `?mission=t0_systems_check` opens the daytime combat test arena.
 
 ## How to add a mission
@@ -181,12 +209,14 @@ To swap in a real file: `game.audio.load('attack', 'assets/audio/attack.ogg')`, 
 - "Climbing the lighthouse" is a cutscene: there are no interiors, stairs, jumping or climbing yet.
 - Sailing is simplified: the sail trims itself, there is no capsizing, and the wind only swings a little.
 - Patrol boats do not avoid each other and only check line of sight against sea rocks.
+- The sniper's line of sight is the same simple 2D check: anything tall hides Veer, even though the sniper stands on a roof.
+- Damini's "race" for the door is told through radio lines only; she cannot win it yet.
 - Guards never leave their routes (by design for this mission) and do not search for the player.
 - Line of sight is checked in 2D against walls, houses and tall stacks; low props do not hide Veer.
 - Combat bots (test arena) still have no path-finding.
 - Shakti effects and all damage numbers are placeholder tuning.
 - Not yet profiled on a real phone. The 30 FPS target must be checked on a mid-range Android device.
-- Stealth and sailing difficulty were tuned with automated players, not with human players.
+- Stealth, sailing and sniper difficulty were tuned with automated checks, not with human players.
 
 ## Tech rules
 

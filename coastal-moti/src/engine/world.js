@@ -177,11 +177,12 @@ export function createWorld(scene) {
   };
 
   // First hit of segment A->B against sight-blocking boxes, as t in [0,1]. Returns 2 when clear.
-  world.segmentT = (ax, az, bx, bz) => {
+  // skip(collider) -> true makes the test ignore that collider.
+  world.segmentT = (ax, az, bx, bz, skip) => {
     const dx = bx - ax, dz = bz - az;
     let best = 2;
     for (const k of world.colliders) {
-      if (!k.blocksSight) continue;
+      if (!k.blocksSight || (skip && skip(k))) continue;
       let t0 = 0, t1 = 1;
       if (Math.abs(dx) < 1e-9) { if (ax < k.minX || ax > k.maxX) continue; }
       else {

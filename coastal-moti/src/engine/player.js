@@ -176,7 +176,7 @@ export function createPlayer(game) {
   // Tool slot. Placeholder tool: a compass ping that highlights the objective.
   function useTool() {
     if (toolCd > 0) return;
-    toolCd = 1.5;
+    toolCd = 0.3;
     game.combat.ring(pos, 0xe8a33d, 4, 0.6);
     game.audio.play('tool');
     game.events.emit('tool');

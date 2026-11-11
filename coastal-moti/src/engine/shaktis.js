@@ -2,7 +2,7 @@
 // Effects and numbers here are PLACEHOLDER tuning for the engine; missions unlock them by id.
 export const SHAKTIS = [
   { id: 'vayu',   name: 'Vayu',   element: 'wind',      color: 0xbfe9e0, cooldown: 3.0, kind: 'dash',       damage: 12, range: 5, push: 11 }, // wind dash: pushes enemies, blows dust away
-  { id: 'agni',   name: 'Agni',   element: 'fire',      color: 0xff7a2f, cooldown: 2.5, kind: 'projectile', damage: 30, speed: 22 },
+  { id: 'agni',   name: 'Agni',   element: 'fire',      color: 0xff7a2f, cooldown: 2.5, kind: 'projectile', damage: 30, speed: 22 }, // fire burst: burns enemies, lights lamps
   { id: 'jal',    name: 'Jal',    element: 'water',     color: 0x3fa9f5, cooldown: 6.0, kind: 'heal',       amount: 30 },
   { id: 'bijli',  name: 'Bijli',  element: 'lightning', color: 0xf7e463, cooldown: 4.0, kind: 'bolt',       damage: 40, range: 16 },
   { id: 'dharti', name: 'Dharti', element: 'earth',     color: 0xb98a55, cooldown: 6.0, kind: 'aoe',        damage: 28, range: 5 },

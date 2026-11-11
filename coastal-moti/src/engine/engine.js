@@ -5,6 +5,8 @@ import { createSea } from './sea.js';
 import { createWeather } from './weather.js';
 import { ENV_DAY } from './environments.js';
 
+const DEFAULT_SUN_DIR = [-0.45, 0.42, -0.79];
+
 // Owns the renderer, scene, camera, lights, weather and the frame loop.
 export function createEngine(canvas, initialQuality) {
   const renderer = new THREE.WebGLRenderer({
@@ -44,6 +46,7 @@ export function createEngine(canvas, initialQuality) {
     SKY.horizon.setHex(env.horizon);
     SKY.sun.setHex(env.sun);
     SKY.sunStrength.value = env.sunDisc;
+    SKY.sunDir.set(...(env.sunDir || DEFAULT_SUN_DIR)).normalize();   // sun (or moon) direction for sky, sea and shadows
     hemi.color.setHex(env.hemi[0]);
     hemi.groundColor.setHex(env.hemi[1]);
     baseHemi = hemi.intensity = env.hemi[2];
